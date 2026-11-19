@@ -1,6 +1,6 @@
 # sure-document — Agent Development Guide
 
-**MIT** — see [LICENSE](LICENSE). No per-file licence header is required
+**MIT** — see [LICENSE](LICENSE). No per-file license header is required
 (matching `sure-factor` and `sure-state`); the package is shared infrastructure,
 not a product.
 
@@ -20,7 +20,7 @@ would not have — see "The agent surface" below.
 |---|---|
 | the element model (`text`, `field`, `line`, `box`, `image`, `table`) | SQL, fetch, joins, caching — that is **sure-state** |
 | expressions and formatters (`P:`, `F:`, `sum:`, `ifpresent:`) | field labels, validation, limits — that is **sure-factor** |
-| pagination, bands, keep-together, page numbers | colours, fonts, class vocabulary — that is **sure-ui** |
+| pagination, bands, keep-together, page numbers | colors, fonts, class vocabulary — that is **sure-ui** |
 | `fixed` (absolute) and `flow` (banded) layout modes | component *definitions* (catalog YAML) — that is **sure-store/components** |
 | print-ready HTML/CSS; PDF compiled by the host at the product edge (`design §11`) | business wording and legal prose — that is each product's content |
 
@@ -45,7 +45,7 @@ class, it is in the wrong repository.
 Every command of this package's CLI is expected to support `--agent`
 (the stack convention — the flag turns the mode on; the default is for humans):
 
-- stdout: one JSON envelope per command; stable key order; no colour, tables,
+- stdout: one JSON envelope per command; stable key order; no color, tables,
   progress or prompts.
 - errors: **always** an envelope — `{ok:false, error:{code,message,hint,details,retryable,exitCode}, trace, events}`
   — and **also emitted as an `error` event** so a supervising agent that never
@@ -117,7 +117,7 @@ fixture, not an example, not a doc snippet:
 - fixtures are **generated** from a recorded seed and carry `"synthetic": true`
   (`docs/acceptance.md §1`);
 - names are invented, amounts are round, dates are in the future;
-- no company name, address, phone, licence, contract number or agent id;
+- no company name, address, phone, license, contract number or agent id;
 - a public repository must not hold the private denylist it is scanned against —
   that scan runs in the consumer's CI (`SUN_DENYLIST`), and this repo keeps only
   the structural checks (synthetic flag, seed, identifier patterns).
@@ -147,7 +147,7 @@ not loosen a pattern. A deliberate placeholder goes in the `ALLOW` list in the
 script, keyed by file + label + exact match, with a reason.
 
 The repository is **private until the first stable release**, then goes public
-under the same MIT licence. At that point also enable branch protection on
+under the same MIT license. At that point also enable branch protection on
 `master` and add the publish workflow (staged npm release, human 2FA approval).
 Protection cannot be set while the repo is private: the account is on GitHub's
 free `User` plan, which returns 403 for branch protection and rulesets on private

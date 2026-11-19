@@ -264,11 +264,11 @@ The table is data, not prose — the renderer ships it, `sure-document paper lis
 Rules:
 
 1. **Points are canonical.** Everything in a layout is points (72 to the inch);
-   inch and millimetre values are conveniences, converted once at parse
+   inch and millimeter values are conveniences, converted once at parse
    (`1 in = 72 pt`, `1 mm = 72/25.4 pt`) and compared in points thereafter.
 2. **Named sizes are portrait.** `orientation: landscape` swaps the two
    dimensions after lookup; a size name never implies an orientation.
-3. **`custom` normalises at parse**, and is then indistinguishable from a named
+3. **`custom` normalizes at parse**, and is then indistinguishable from a named
    size — the rest of the system never sees the unit.
 4. **A unit mistake is caught, not printed.** `612 × 792` declared in `mm`
    (a metric page 21 inches wide) or `8.5 × 11` declared in `pt` (a stamp) fails
@@ -298,7 +298,7 @@ fixed panel and a flow document, and they must survive printing.
 
 1. **Arbitrary angle, one transform.** The layer covers the sheet and is clipped
    (`overflow: hidden`, diagonal-sized); the text is rotated by `angle` about its
-   centre. Tiling repeats it on a grid whose offsets are derived from `angle` and
+   center. Tiling repeats it on a grid whose offsets are derived from `angle` and
    `step` — never from a clock or a random seed (A8).
 2. **Behind, never over.** `z-index` below the body, `pointer-events: none`,
    `user-select: none`, `aria-hidden="true"`, opacity capped at **0.15** so it
@@ -379,8 +379,8 @@ adding a TOC later means reworking the pass.
 
 1. **SVG by construction.** Data → scale → path. No canvas, no charting
    dependency, no animation.
-2. **Readable in grayscale.** Theme tokens for series colour, plus a
-   dash/pattern fallback; a figure that only works in colour is rejected.
+2. **Readable in grayscale.** Theme tokens for series color, plus a
+   dash/pattern fallback; a figure that only works in color is rejected.
 3. **Accessible.** `<title>`/`<desc>` on every figure and a data-table fallback
    for screen readers. In print the fallback is hidden by default so the chart
    and its table do not print back-to-back; a layout may opt in. The print rule

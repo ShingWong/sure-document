@@ -56,7 +56,7 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 | # | Question | Recommendation |
 |---|---|---|
 | 1 | `document-watermark` or `document-stamp`? | watermark — it is the word a printer uses |
-| 2 | Watermark default: one centred mark or a tile? | one, tiled is opt-in |
+| 2 | Watermark default: one centered mark or a tile? | one, tiled is opt-in |
 | 3 | Non-production stamp wording | `EXAMPLE ONLY` |
 | 4 | Do `tabloid`, `executive`, `b5` earn a place in the paper table? | ship `letter`, `legal`, `statement`, `a4`, `a5` + custom; add others when a document needs them |
 | 5 | Is `booklet` in 0.1? | no — named in the type, refused in the renderer |
@@ -69,7 +69,7 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 Classes from `docs/catalog.md §2` and `plan.md` Phase 1. Print rules belong in
 the `document` block (page breaks, keep-together, header/footer repetition),
 figure typography and monochrome safety in `figure`. Tests, same shape as the
-existing `footer` block: every theme, tokens only (no literal colours), the
+existing `footer` block: every theme, tokens only (no literal colors), the
 print rule present, `compose()` fixture regenerated.
 
 **2. sure-factor 0.6: catalog schema**
@@ -99,7 +99,7 @@ tested against.
   boxes, never a block inside one. The first consumer shipped a sheet nested in
   a band: the paper was correct and its site footer printed through page two —
   the defect was only visible on screen, which is why §11 draws the paper there.
-- **No product identifiers** — no company name, address, licence, contract
+- **No product identifiers** — no company name, address, license, contract
   number, agent id. The public repository cannot hold the denylist it is scanned
   against; that scan runs in the consumer's CI.
 - **Never declare a sure-ui block that is not published** — the registry test

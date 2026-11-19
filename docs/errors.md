@@ -1,4 +1,4 @@
-# Error catalogue
+# Error catalog
 
 Every failure the renderer can raise, with the fix. **The codes are the
 contract**: they appear in `--agent` envelopes, in the event journal, and in
@@ -33,7 +33,7 @@ Envelope (in `--agent` mode):
 | `ECONFIRM` | 4 | a destructive command ran without `--yes` | add `--yes`; nothing was changed |
 | `EINTERACTIVE` | 4 | a command wanted a prompt | pass the flag named in `error.hint`; nothing waits |
 
-## Rules the catalogue encodes
+## Rules the catalog encodes
 
 1. **Fail closed.** A document that cannot be rendered correctly is not rendered
    at all — never a page with a blank where a total should be. (A blank *field*

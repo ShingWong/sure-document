@@ -18,6 +18,7 @@ same thing will guess wrong.
 | **row** | one entity from a store, as the renderer receives it | a database row |
 | **guard** | a machine-checkable rule over the data a document printed | a warning |
 | **fixture** | an input plus the output facts a document must produce | a screenshot |
+| **synthetic fixture** | test data generated from a recorded seed, carrying `"synthetic": true` and that seed | scrubbed production data, copied JSON, unseeded random rows (`acceptance.md §1`) |
 | **fixed** | absolute geometry in points, from a design | legacy (it is a supported mode) |
 | **flow** | banded layout whose length is data | modern |
 | **render** | layout + data → HTML, purely | print, export |
@@ -25,9 +26,11 @@ same thing will guess wrong.
 | **furniture** | sheet-level parts that repeat or identify: header, footer, page number, date, logo, watermark | a band, a section |
 | **running header** | the header repeated on every sheet of a multi-page document | the document title inside the body |
 | **watermark** | rotated text drawn behind the body (`Example Only`, `Void`) — never the only carrier of a notice | a notice, a stamp |
-| **capture date** | a date supplied when the document was frozen | the clock |
+| **issued date** | a date originating from domain data (`effective_on`, an invoice date) — `kind: issued` | the clock, a captured date (`design §10`) |
+| **captured date** | an explicit input timestamp frozen at the moment of capture — `kind: captured` | `Date.now()`, the clock, a runtime timestamp (`design §10`) |
 | **pagination pass** | the measurement step that cuts flow content into sheets and makes `of N` true | browser page breaks |
-| **paper size** | a named size from the ten-entry table, or a custom `{unit, w, h}` normalised to points | a sheet, an orientation |
+| **measurement oracle** | the injected function that measures element dimensions from declared sure-ui type tokens during pagination | a headless browser, DOM measurement, or host font metrics (A32) |
+| **paper size** | a named size from the ten-entry table, or a custom `{unit, w, h}` normalized to points | a sheet, an orientation |
 | **body box** | what is left of the sheet after margins, gutter, header and footer | the sheet |
 | **gutter** | extra inner margin for binding; comes out of the body | a margin |
 | **binding edge** | the side that is bound or punched (`left`, `right`, `top`, `bottom`) | the margin side |
@@ -50,6 +53,7 @@ same thing will guess wrong.
 | **cut marks** | hairlines in the margin showing where a sheet is cut (coupons) | content |
 | **scale** | a rendering factor the document applies and records | zoom |
 | **zoom** | a viewer transform on the preview; never printed | scale |
+| **applied scale** | the uniform factor recorded after pagination for `fit: width \| page` | viewer zoom, pre-pagination reflow (`design §3.3`) |
 | **template** | sure-factor's Handlebars/htmx output — a *generator* word, never a document | a layout |
 | **report** | the catalog *family* of parts; also the domain word for "a document with rows" | the engine |
 
@@ -57,8 +61,8 @@ same thing will guess wrong.
 
 - `document`, never `doc` — package, block, entries, CLI verb, code all agree
   (see `README.md §Name`).
-- `program`, `license`, `colour` is not used in this repo; code and docs are
-  US English, matching the paper the office prints.
+- UK spellings — `programme`, `licence`, `colour`, `millimetre`, `centre` — are
+  not used; code and docs are US English, matching the paper the office prints.
 - Field **labels** belong to sure-factor; print **formats** belong here. Two
   words, two owners — do not use "format" for a label.
 
@@ -66,6 +70,7 @@ same thing will guess wrong.
 
 | Name | Reads as |
 |---|---|
+| `sure-document` | the standalone CLI binary for this package: `render\|validate\|paper\|vars\|state\|events`; resolves `--entity`/`--id` through sure-state, while the library call is `renderDocument({ layout, data })` |
 | `document-table` | a table that is part of a document (print) — not the interactive `data-table` |
 | `figure-bar` | a bar figure — SVG, printable, one data shape: series |
 | `sure-document__sheet` | the sure-ui class for the sheet inside the document block |

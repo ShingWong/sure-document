@@ -39,7 +39,7 @@ finished project never get switched on.
       criteria (A2, A3, A8, A9, A11, A32, A33)
 - [ ] CI gates: link + anchor check, example replay, generated-reference
       freshness, error-code coverage (`src` ↔ `errors.md`)
-- [ ] Definition of done written into AGENTS.md: behaviour change ⇒ test +
+- [ ] Definition of done written into AGENTS.md: behavior change ⇒ test +
       doc row + changelog entry in the same commit
 
 **Acceptance:** CI fails when a documented example stops running, when an error
@@ -65,7 +65,7 @@ document decision while leaving `zoom` to the viewer (`§3.2`).
   screen rules that draw the sheet as paper, so the print rules only have to
   defer size and margins to `@page` (`design §11`);
 - figures monochrome-safe; no animation;
-- tokens only — no literal colours (the footer block's test is the model).
+- tokens only — no literal colors (the footer block's test is the model).
 
 **Acceptance:** every theme styles both blocks; the `compose()` fixture is
 regenerated; the registry test in sure-factor passes against the published
@@ -169,7 +169,7 @@ an API reference generated from TSDoc, a CHANGELOG with migration notes.
 **Agent:** the `sure-document` skill in `.opencode/skills/` (when to use it,
 the composition recipe, the five mistakes), `sure-document schema --agent`
 committed as `docs/schema.json`, the catalog reference generated from the YAML
-(data shape, guards, fixture per entry), and the error catalogue regenerated
+(data shape, guards, fixture per entry), and the error catalog regenerated
 from the codes' tests.
 
 **Shared:** `docs/index.md` reading orders; the glossary as the tie-breaker for
@@ -207,4 +207,4 @@ aspirations. The last two are the ones that matter.
 | The catalog becomes a second registry | entries live in sure-store/components, loaded by sure-factor; this package consumes |
 | PDF pulls a browser into the library | PDF stays at the product edge; the package renders HTML only |
 | The statement never happens, so the abstraction is unproven | it is Phase 5, before any publish |
-| Documentation drifts from behaviour — the failure mode that killed the `.jasper` designs, one level up | every reference is generated, every example is a test, and the definition of done puts the doc line in the same commit as the code |
+| Documentation drifts from behavior — the failure mode that killed the `.jasper` designs, one level up | every reference is generated, every example is a test, and the definition of done puts the doc line in the same commit as the code |

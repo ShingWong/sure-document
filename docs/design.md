@@ -66,7 +66,7 @@ export const PAPER_SIZES = {
 
 type PaperSize =
   | keyof typeof PAPER_SIZES
-  | { unit: "pt" | "mm" | "in"; w: number; h: number }   // custom, normalised to pt at parse
+  | { unit: "pt" | "mm" | "in"; w: number; h: number }   // custom, normalized to pt at parse
 
 /**
  * The sheet is document-level; a **section** (or the single page of a fixed
@@ -93,11 +93,11 @@ interface Sheet {
 
 Decisions:
 
-- **Points are canonical; named sizes are portrait.** Inch and millimetre
+- **Points are canonical; named sizes are portrait.** Inch and millimeter
   inputs are converted once at parse (`1 in = 72 pt`, `1 mm = 72/25.4 pt`), and
   `orientation` swaps the dimensions afterwards. Converted values are rounded to
   **4 decimal places** at that single parse, before serialization or the capture
-  hash, so a millimetre input and its point equivalent produce identical bytes
+  hash, so a millimeter input and its point equivalent produce identical bytes
   (A8, A19b). Downstream code only ever sees points, so a custom size and a named
   size are indistinguishable after parse.
 - **A unit mistake fails loudly.** `612 × 792` in `mm`, or `8.5 × 11` in `pt`,
@@ -373,7 +373,7 @@ reports. The render therefore iterates:
 layout → paginate → sections[] → render TOC → relayout → paginate → …
 ```
 
-Three behaviours matter:
+Three behaviors matter:
 
 - **Convergence is bounded.** A TOC that moves from one page to two changes the
   numbers again; the loop stops when the TOC's own length is stable, and fails
@@ -461,7 +461,7 @@ The dependency stays in the *product*, not in this package.
 stack convention:
 
 - `--agent` turns on the machine contract: JSON envelopes, structured errors,
-  no prompts, no colour.
+  no prompts, no color.
 - errors are emitted **as events** as well as returned, so a supervising agent
   sees failures from operations it did not run.
 - complete visibility: `vars` (resolved values with provenance), `state`
@@ -486,7 +486,7 @@ test harness without a browser.
 | 1 | Where do the ported fixed panels live — this package or the product? | product content, engine here: the *agreement* is the product's, the *renderer* is the stack's |
 | 2 | PDF dependency policy — **closed 2026-11-19** | Chromium at the product edge; this package stays dependency-free (`§11`). Settled; no longer open. |
 | 3 | Does the event journal belong in sure-state or here? | sure-state — it emits the events; this package consumes them |
-| 4 | Licence | MIT, like the rest of the shared stack |
+| 4 | License | MIT, like the rest of the shared stack |
 | 5 | First flow document | monthly statement — it exercises rows, grouping and a figure; a notice is prose and proves less |
 | 6 | New sure-ui families | exactly two: `document` and `figure`. Everything printable that already exists (tables, totals, prose) reuses `table` / `markdown` rather than inventing a family |
 | 6a | Watermark default in non-production | stamp `EXAMPLE ONLY` from the environment unless the layout overrides — a preview deployment must not print an unmarked contract that looks real |

@@ -79,7 +79,7 @@ layout  +  data  →  render  →  HTML  →  print | PDF
 | a fixture | `"synthetic": true` + a seed; never a real row (`acceptance.md §1`) |
 | a phase completed | `plan.md` checkbox, `CHANGELOG.md` |
 
-A pull request that changes behaviour without the matching doc line is
+A pull request that changes behavior without the matching doc line is
 incomplete, the same way a change without a test is.
 
 ## Generated, never hand-written
@@ -89,7 +89,7 @@ incomplete, the same way a change without a test is.
 | API reference | TSDoc in `src/` | CI regenerates and diffs; a stale file fails |
 | catalog reference | `sure-store/components/*.yaml` | schema validation + fixture replay |
 | CLI schema | command definitions | `sure-document schema --agent` compared to the committed file |
-| error catalogue | the codes' tests | every code in `src/` must appear in `errors.md` |
+| error catalog | the codes' tests | every code in `src/` must appear in `errors.md` |
 | examples | `examples/` fixtures | every example runs in `npm test` |
 
 ## Deliberate omissions

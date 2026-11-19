@@ -20,7 +20,7 @@
  * is a deliberate placeholder or RFC 2606 example.
  *
  * This repo deliberately does NOT hold the private product denylist (company
- * name, address, licence, contract number, agent id): that scan runs in the
+ * name, address, license, contract number, agent id): that scan runs in the
  * consumer's CI with SUN_DENYLIST. What lives here is the structural part —
  * secrets, PII, internal paths, and the "synthetic": true + seed rule from
  * docs/acceptance.md §1.

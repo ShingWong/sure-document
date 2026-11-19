@@ -8,7 +8,7 @@ source of truth.
 The stack is agent-first. A document here is text a coding agent can read,
 diff, generate and *verify*: a layout in TS/JSON plus a fixture that says what
 the output must contain. That is the whole difference from the thing it
-replaces — a 2007 JasperReports `.jasper` is a compiled Java serialisation that
+replaces — a 2007 JasperReports `.jasper` is a compiled Java serialization that
 only iReport can open, so nothing could check it and nothing could improve it.
 
 ```
