@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Performance
+
+- Added `scripts/bench.mjs` and `npm run bench`: 20 warmup + 200 timed renders
+  of three synthetic workloads against the built package, reporting median,
+  p95 and throughput. README publishes the measured numbers and hardware.
+
 ### Documentation
 
 - `docs/design.md` is now an append-only Architectural Decision Record. All

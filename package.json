@@ -32,6 +32,7 @@
     "test": "vitest run",
     "fixtures": "tsx fixtures/generate.ts",
     "fixtures:examples": "tsx scripts/make-examples.mjs",
+    "bench": "npm run build && node scripts/bench.mjs",
     "typography:generate": "node scripts/generate-typography.mjs",
     "check:typography": "node scripts/check-typography.mjs",
     "check:exports": "node scripts/check-exports.mjs",

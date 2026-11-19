@@ -36,14 +36,40 @@ document printing as an expensive simulation of a browser viewport.
 | Dimension | Enterprise simulation (Jasper / headless Chrome) | The sure stack (`sure-document`) |
 |---|---|---|
 | **Engine footprint** | JVM classpaths, Chromium binaries | **~228 KB built dist**, zero runtime dependencies, no browser process |
-| **Execution model** | Cold starts, DOM cascades, reflow | Pure arithmetic: width − margins − gutter − furniture |
+| **Execution model** | Cold starts, DOM cascades, reflow | Pure arithmetic: width − margins − gutter − furniture; sub-millisecond medians in the bundled benchmark |
 | **Memory model** | A browser worker per render | No browser engine to allocate for; the renderer is a pure function |
 | **Scoping & logic** | Embedded runtimes (Groovy, V8 JS) | **Closed grammar**: five aggregates + `ifpresent`, explicit `@`/`.` sigils, no ambient evaluation |
 | **Verification gate** | Visual proofreading, screenshot diffs | Stable error codes, declared guards and fixture facts |
 
-The built `dist/` is currently ~228 KB. Latency and memory depend on the host and
-document size; the architectural claim is the absence of a browser or JVM, not a
-fixed millisecond number.
+The built `dist/` is currently ~228 KB. See [Performance](#performance) for
+measured render times and how to reproduce them.
+
+---
+
+## Performance
+
+Performance is a design property here: the renderer is a pure forward projection
+over arrays and numbers, with no browser, no DOM, no reflow and no cold start.
+The bundled benchmark measures the **built package** with 20 warmup and 200
+timed renders per case:
+
+```bash
+npm run bench
+```
+
+Measured on this machine (Linux x64, Intel Xeon E5-2698 v4 @ 2.20 GHz, Node
+v22.23.4):
+
+| Workload | Sheets | HTML | Median | p95 | Throughput |
+|---|---:|---:|---:|---:|---:|
+| 12 positioned text elements | 1 | 2.2 KB | 0.061 ms | 0.177 ms | ~16,300 renders/s |
+| 40-row statement table | 1 | 6.1 KB | 0.084 ms | 0.268 ms | ~11,900 renders/s |
+| ten flat sibling sheets | 10 | 11.5 KB | 0.180 ms | 0.434 ms | ~5,600 renders/s |
+
+These are in-memory render numbers on one host, not a guarantee; rerun the
+benchmark on your hardware. Browser print-to-PDF compilation happens in the host
+and is deliberately not measured here — that is the work this package refuses to
+do.
 
 ---
 
