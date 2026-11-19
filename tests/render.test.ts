@@ -317,7 +317,10 @@ describe('renderDocument — fixed mode', () => {
         }],
       },
     })
-    expect(result.html).not.toMatch(/--sure-font|--sure-type|var\(--sure-/)
+    // Only the five typography variables sure-ui 0.3.7 actually declares may
+    // appear; --sure-type and any invented --sure-font-* remain forbidden.
+    expect(result.html).not.toMatch(/--sure-font-(?!body|h1|h2|caption|mono\b)|--sure-type/)
+    expect(result.sheets[0]).toContain('font-family:var(--sure-font-body)')
     expect(result.sheets[0]).toContain('--sure-sheet-w:612pt')
     expect(result.sheets[0]).toContain('--sure-watermark-angle:-45deg')
     expect(result.sheets[0]).toContain('--sure-graphic-max-height:12pt')

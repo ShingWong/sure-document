@@ -30,6 +30,7 @@ import {
   formatNumber,
   formatDate,
   createMeasurementOracle,
+  SURE_DOCUMENT_TYPOGRAPHY,
   type MeasurementOracle,
 } from './format.js'
 import { fail, DocumentError, type ErrorCode } from './errors.js'
@@ -606,6 +607,9 @@ function renderSheet(
     `--sure-sheet-margin:${pt(sheet.margins.left)}`,
     `--sure-sheet-gap:${SHEET_GAP}`,
     '--sure-sheet-scale:1',
+    // sure-ui 0.3.7 owns the typography scale; the preview paints through its
+    // CSS variable while the oracle uses the same map's point metrics.
+    `font-family:${SURE_DOCUMENT_TYPOGRAPHY.body.css}`,
   ]
   if (mark.angle !== undefined) vars.push(`--sure-watermark-angle:${num(mark.angle)}deg`)
   if (mark.opacity !== undefined) vars.push(`--sure-watermark-opacity:${num(mark.opacity)}`)
