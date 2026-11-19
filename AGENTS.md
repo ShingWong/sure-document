@@ -21,7 +21,7 @@ would not have — see "The agent surface" below.
 | expressions and formatters (`P:`, `F:`, `sum:`, `ifpresent:`) | field labels, validation, limits — that is **sure-factor** |
 | pagination, bands, keep-together, page numbers | colours, fonts, class vocabulary — that is **sure-ui** |
 | `fixed` (absolute) and `flow` (banded) layout modes | component *definitions* (catalog YAML) — that is **sure-store/components** |
-| HTML rendering, print CSS, optional PDF | business wording and legal prose — that is each product's content |
+| print-ready HTML/CSS; PDF compiled by the host at the product edge (`design §11`) | business wording and legal prose — that is each product's content |
 
 If a change makes this package query data, know a column name, or invent a CSS
 class, it is in the wrong repository.
@@ -36,6 +36,8 @@ class, it is in the wrong repository.
 - **No second catalog registry.** Definitions live in `sure-store/components/`;
   this package consumes them through sure-factor's loader.
 - **No query builder.** See table above.
+- **No PDF engine.** No headless-browser or PDF dependency of any kind — this
+  package emits HTML/CSS; the host compiles it (`design §11`).
 
 ## The agent surface
 
@@ -54,10 +56,18 @@ Every command of this package's CLI is expected to support `--agent`
   by monotonic sequence).
 - destructive operations require `--yes`; without it the answer is `ECONFIRM`.
 
-A document command must be verifiable the same way:
+A document command must be verifiable the same way. This example is the
+**umbrella `sure` CLI** — it resolves `--entity`/`--id` through sure-state and
+hands plain rows to this package; the renderer itself never fetches them:
 
 ```
 sure document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent
+```
+
+At the package boundary the call is pure and takes local inputs:
+
+```ts
+renderDocument({ layout, data })   // layout + data → HTML string
 ```
 
 `--verify-totals` recomputes server-side and fails if the paper disagrees.
@@ -156,7 +166,10 @@ npm run verify      # lint && build && test && check:exports
 
 Fixture goldens are the point: a layout change must show which documents
 changed. The ported legacy paper (see `docs/legacy-report-engine.md`) is the first
-corpus — 150 / 42 / 19 elements, page counts, key strings.
+corpus — 150 / 42 / 19 elements, page counts, key strings. Goldens assert **facts**
+(element counts, coordinates, sheet counts, key strings), never raw HTML bytes:
+a change in attribute order or whitespace is not a document change (`design §8`,
+`plan.md` Phase 4).
 
 ## Exports (planned, sure-factor's shape)
 
@@ -182,6 +195,12 @@ A **generated** report module follows sure-factor's client-target precedent
   carries `sure-ui` and `pg`; this package deliberately carries nothing.)
 - Pure functions: a renderer that touches the DOM, the clock or the network is
   untestable and unverifiable.
+- **No dynamic code execution.** Expression parsing is the closed vocabulary in
+  `design §5`, implemented as a micro-parser — never `eval()`, `new Function()`
+  or a third-party AST engine.
+- **Explicit inputs only.** Formatters take the declared format and typed values;
+  they never read the host clock or locale, and no caller-supplied locale may
+  change the paper (A2, A9, A17; `design §6`, `§10`).
 - One responsibility per file; no dead code, no commented-out code.
 - Tests are the specification: every expression form, every formatter, every
   page-break rule has one.

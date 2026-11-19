@@ -454,7 +454,7 @@ test harness without a browser.
 | # | Question | Leaning |
 |---|---|---|
 | 1 | Where do the ported fixed panels live — this package or the product? | product content, engine here: the *agreement* is the product's, the *renderer* is the stack's |
-| 2 | PDF dependency policy | Chromium at the product edge; this package stays dependency-free |
+| 2 | PDF dependency policy — **closed 2026-11-19** | Chromium at the product edge; this package stays dependency-free (`§11`). Settled; no longer open. |
 | 3 | Does the event journal belong in sure-state or here? | sure-state — it emits the events; this package consumes them |
 | 4 | Licence | MIT, like the rest of the shared stack |
 | 5 | First flow document | monthly statement — it exercises rows, grouping and a figure; a notice is prose and proves less |

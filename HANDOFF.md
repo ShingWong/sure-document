@@ -47,6 +47,9 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 8. **MIT**, like the rest of the shared stack.
 9. **Release order**: sure-ui blocks → sure-factor schema → catalog entries →
    sure-document. The registry test validates against the *installed* sure-ui.
+10. **PDF output boundary** (closed 2026-11-19): this package emits print-ready
+    HTML/CSS only; headless Chromium compilation stays at the product edge
+    (`design §11`, §14 decision 2). No PDF or headless-browser dependency here.
 
 ## Open decisions — ask, do not assume
 
@@ -57,7 +60,6 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 | 3 | Non-production stamp wording | `EXAMPLE ONLY` |
 | 4 | Do `tabloid`, `executive`, `b5` earn a place in the paper table? | ship `letter`, `legal`, `statement`, `a4`, `a5` + custom; add others when a document needs them |
 | 5 | Is `booklet` in 0.1? | no — named in the type, refused in the renderer |
-| 6 | PDF: Chromium at the product edge, or a package concern? | product edge; the package renders HTML only |
 | 7 | Where do the ported fixed panels live? | the product's repository — the engine is generic, the paper is theirs |
 
 ## First three tasks, in order
