@@ -380,7 +380,9 @@ adding a TOC later means reworking the pass.
 2. **Readable in grayscale.** Theme tokens for series colour, plus a
    dash/pattern fallback; a figure that only works in colour is rejected.
 3. **Accessible.** `<title>`/`<desc>` on every figure and a data-table fallback
-   rendered for print and screen readers.
+   for screen readers. In print the fallback is hidden by default so the chart
+   and its table do not print back-to-back; a layout may opt in. The print rule
+   belongs to the sure-ui `figure` block (`design.md §4`).
 4. **Honest.** No donut beyond five slices, no truncated axis without a visible
    break, no 3D, no shadows.
 5. **Printable.** Fits the sheet's column width; never assumes hover.

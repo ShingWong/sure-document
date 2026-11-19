@@ -150,7 +150,14 @@ Two numbers people confuse, and the confusion costs a legal form its geometry:
 | affects print | yes | **never** |
 | affects the capture hash | yes (recorded as `appliedScale`) | no |
 | allowed in fixed mode | only `1.0` (`E_SCALE`) | irrelevant |
-| allowed in flow mode | `fit: none \| width \| page`, computed once, deterministically | irrelevant |
+| allowed in flow mode | `fit: none \| width \| page`, applied once after pagination (`appliedScale` recorded) | irrelevant |
+
+`fit` is **not** a layout input. The pagination pass cuts sheets from the
+unscaled body; `fit` then applies one uniform scale to those finished sheets. It
+never feeds back into pagination, so sheet count and boundaries are fixed before
+scaling and there is no convergence loop — the reason it is deterministic (A21),
+and why `zoom`, a viewer transform that never reaches the paper, is a different
+thing.
 
 A printer driver may still shrink the page; that is outside the document, so the
 defence is a calibration sheet from `sure-document print-check`, printed on the
@@ -185,6 +192,12 @@ watermark  { text, angle, opacity, repeat, pages, mode }
 
 Flow mode adds structural elements (`section`, `row`, `cell`, `keep`, `break`,
 `page-number`) rather than reusing coordinates.
+
+Figures are inline SVG built from a scale, with `<title>`, `<desc>` and a
+data-table fallback. The fallback serves screen readers; in print it is hidden
+by default so the chart and its table do not print back-to-back, and a layout may
+opt in. The print rule itself lives in the sure-ui `figure` block (plan Phase 1);
+this paragraph is the contract that block implements. See `catalog.md §4`.
 
 Classes follow sure-factor's registry rule — the family is the first token after
 `sure-`, and it must exist in sure-ui's `COMPONENTS`. So the sheet and figures
@@ -303,6 +316,15 @@ it can print (a measurement oracle, injected, so tests can be deterministic),
 and a sheet is a unit of layout, so `keep-together` is arithmetic over measured
 blocks rather than a CSS hint.
 
+The oracle's contract: measurements are keyed to the declared type tokens —
+family, size and line-height from sure-ui — and the metric source is an injected
+input, never an implicit lookup of the host's fonts or locale. The host must load
+the declared fonts, or the design must declare a fixed fallback set, so the
+browser wraps lines where the oracle measured them. A font that cannot be
+resolved from the declared tokens fails at render rather than silently
+substituting a host font (A32). The package ships no font binaries and no metric
+engine of its own.
+
 ### 9.1 Numbering is a partition, not a counter
 
 The pagination pass returns sheets, and separately a **numbering plan**:
@@ -376,7 +398,7 @@ document in the flow was then laid out at the end of *page one* and painted
 through the middle of page two. The paper was right. The screen was wrong, and
 nobody saw it until a human opened the preview.
 
-Three rules follow:
+Four rules follow:
 
 1. **A panel is an input, not an output.** A fixed renderer accepts a panel and
    returns the sheets it becomes. A single-panel convenience is fine for one
@@ -388,10 +410,15 @@ Three rules follow:
 3. **Nothing is measured across a sheet boundary.** Body content, a running
    header and a keep-together group each belong to exactly one sheet; a group
    that would span two is moved, never split.
+4. **A table repeats its head, never its rows.** A continued sheet repeats the
+   table's `<thead>`; a row is never split across a boundary (`break-inside:
+   avoid`). A row taller than the printable body height fails `E_LAYOUT` rather
+   than being clipped or silently shunted to the next sheet (A33).
 
-All three are mechanically checkable, which is the point: an agent asserts the
-sheet count, the sibling structure, and that the element following the document
-begins below the last sheet (A30, A31).
+All four are mechanically checkable, which is the point: an agent asserts the
+sheet count, the sibling structure, that the element following the document
+begins below the last sheet (A30, A31), and that no row crosses a boundary
+(A33).
 
 ## 10. Dates: three kinds, and only two are allowed
 

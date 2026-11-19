@@ -15,7 +15,7 @@ the page is the bug.
 | 1 | [AGENTS.md](../AGENTS.md) | what belongs here, what is refused, the gates |
 | 2 | [design.md](design.md) §1–§5 | the model: layout + data → HTML; fixed vs flow; the expression vocabulary |
 | 3 | [catalog.md](catalog.md) §2–§3 | the parts that exist and the data shape each eats |
-| 4 | [acceptance.md](acceptance.md) | the fixture data policy and the A1–A13 acceptance suite |
+| 4 | [acceptance.md](acceptance.md) | the fixture data policy and the A1–A33 acceptance suite |
 | 5 | [../examples/](../examples/) | runnable fixtures — copy one, change the data |
 | 6 | `sure-document schema --agent` | the machine contract: arguments, outputs, error codes |
 | 7 | [errors.md](errors.md) | every failure the renderer can raise, and what to do |

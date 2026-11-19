@@ -79,7 +79,7 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 | **A4 blanks vs totals** | given a null field the design guards, then blank paper; given a missing total, then `E_DATA` | a signed form with a hole in it |
 | **A5 guards** | given rows whose sum disagrees with the recomputed total, then `E_GUARD` and no output | the failure Jasper could not detect |
 | **A6 pagination** | given 0, 1, 10, 11 and 40 rows, then the page count, repeated header and keep-together are as specified | a page that splits a signature block |
-| **A7 figures** | given a series, then the SVG has `<title>`/`<desc>`, a table fallback, and no colour-only encoding; given 6 slices to a donut, then a refusal | an unreadable chart on a grayscale printer |
+| **A7 figures** | given a series, then the SVG has `<title>`/`<desc>`, a table fallback, and no colour-only encoding; on paper the fallback is hidden unless the layout opts in; given 6 slices to a donut, then a refusal | an unreadable chart on a grayscale printer, or a chart and its table printed back-to-back |
 | **A8 determinism** | given the same layout and data, then two renders are byte-identical | a diff on every run, so nobody reads the diff |
 | **A9 purity** | given a render with `fetch`, `Date.now` and `Intl` stubbed to throw, then it still succeeds | hidden I/O and locale dependence |
 | **A10 agent envelope** | given `--agent` and a forced failure, then stdout is one JSON envelope, the error is in the event journal, and the exit code is the documented one | an agent parsing prose |
@@ -111,6 +111,8 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 
 | **A30 sheets are siblings** | given a design whose summary band names a second panel, then `sheets[]` has one entry per page, each a top-level box, with the break between entries; a panel nested inside a band fails `E_LAYOUT`; the element following the document starts below the last sheet | a site footer printed through page two, because page two was a block inside page one |
 | **A31 screen is paper** | given a letter document at `scale: 1`, then on screen each sheet measures the declared paper with the page margins as padding and a gap between sheets, and printing that same markup yields exactly `sheets.length` pages | a preview that looks like a web page while the print looks like a document, so every defect is discovered on paper |
+| **A32 measurement determinism** | given the same layout and data rendered with the declared type tokens, then identical sheet boundaries regardless of the host's fonts or locale; given a font not resolvable from those tokens, then a render-time failure rather than silent host-font substitution | a document measured with one font and painted with another, wrapping differently in the browser |
+| **A33 table splits** | given a table spanning three sheets, then `<thead>` repeats on each continued sheet and no row crosses a boundary; given a row taller than the printable body, then `E_LAYOUT` | a continued table whose data rows have no headings, or a row clipped at the trim |
 
 A12, A14 and A18 need a browser; they belong to the consumer's browser suite,
 not to the dependency-free unit tests. They are listed here so they are not

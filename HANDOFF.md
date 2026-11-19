@@ -19,7 +19,7 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 | `AGENTS.md` | what belongs here, refusals, agent surface, doc duties, data hygiene, gates |
 | `docs/design.md` | 14 numbered decisions: modes, sheet, elements, expressions, verification, pagination, numbering, output |
 | `docs/catalog.md` | 21 catalog entries, the four extension keys, two new sure-ui blocks, sheet/paper/numbering rules |
-| `docs/acceptance.md` | A1–A29, the fixture generator, the synthetic-data policy |
+| `docs/acceptance.md` | A1–A33, the fixture generator, the synthetic-data policy |
 | `docs/errors.md` | 18 stable error codes with exit codes |
 | `docs/glossary.md` | one word per concept — use it, don't invent synonyms |
 | `docs/legacy-report-engine.md` | why compiled report engines are being replaced (generic) |
