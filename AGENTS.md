@@ -134,7 +134,9 @@ and the `"synthetic": true` + seed fixture contract. It is dependency-free and
 runs at two points:
 
 - **commit** — the `githooks/pre-commit` hook. Enable it once per clone with
-  `git config core.hooksPath githooks`.
+  `git config core.hooksPath githooks`. It scans the **index**, not the working
+  tree, so staged content is what is checked even if the file was later deleted
+  from disk.
 - **push / PR** — `.github/workflows/security.yml`, which runs the same scanner
   in CI so the gate holds even for a clone that skipped the hook.
 

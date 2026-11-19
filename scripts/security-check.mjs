@@ -4,8 +4,10 @@
  *
  * Scans every tracked file (docs, examples, workflows) plus the files npm
  * always ships (README.md, LICENSE, package.json). Binary files are skipped.
- * Runs in the pre-commit hook, in CI on push/PR, and will run in
- * `prepublishOnly` once the package is published.
+ * With git available, content is read from the index blob — what the commit
+ * will actually contain — not from the working tree, so a staged-then-deleted
+ * file cannot slip past the hook. Runs in the pre-commit hook, in CI on push/PR,
+ * and will run in `prepublishOnly` once the package is published.
  *
  * Dependency-free on purpose: the hook and prepublishOnly must not fetch
  * anything, so this runs under plain `node` on a fresh clone.
@@ -155,6 +157,28 @@ function trackedFiles() {
   }
 }
 
+/**
+ * Read a path as it will be committed, not as it happens to sit on disk.
+ * In git mode the index blob is authoritative: a file that was staged and then
+ * deleted from the working tree is still in the commit the hook is guarding.
+ * Outside git (tarball/npm context) there is no index, so read the file.
+ */
+function readContent(rel, gitMode) {
+  if (gitMode) {
+    try {
+      return execFileSync('git', ['show', `:${rel}`], {
+        cwd: ROOT,
+        encoding: 'utf-8',
+        maxBuffer: 4 * 1024 * 1024,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+    } catch {
+      // Not in the index (e.g. a root file in a fresh clone) — fall through.
+    }
+  }
+  return readFileSync(join(ROOT, rel), 'utf-8')
+}
+
 function walk(dir, acc = []) {
   for (const entry of readdirSync(join(ROOT, dir))) {
     const rel = `${dir}/${entry}`
@@ -169,24 +193,18 @@ function walk(dir, acc = []) {
   return acc
 }
 
-function scanPath(rel, findings) {
+function scanPath(rel, findings, gitMode) {
   const full = join(ROOT, rel)
   const ext = extname(full).toLowerCase()
   if (BINARY_EXTENSIONS.has(ext)) return
   if (TEST_FILE.test(rel)) return // synthetic fixtures — see TEST_FILE above
-  let stat
-  try {
-    stat = statSync(full)
-  } catch {
-    return
-  }
-  if (!stat.isFile() || stat.size > MAX_BYTES) return
   let text
   try {
-    text = readFileSync(full, 'utf-8')
+    text = readContent(rel, gitMode)
   } catch {
     return
   }
+  if (Buffer.byteLength(text, 'utf8') > MAX_BYTES) return
   // A NUL byte means binary content with a text extension (.gitattributes edge).
   if (text.includes('\0')) return
   findings.push(...scanText(text, rel.split(sep).join('/')))
@@ -198,13 +216,13 @@ function scanPath(rel, findings) {
  * contract, so an unmarked one is a hygiene failure, not a style nit.
  */
 const FIXTURE_FILE = /(?:^|\/)(?:fixtures?|examples)\/.*\.json$/
-function checkFixtures(files, findings) {
+function checkFixtures(files, findings, gitMode) {
   for (const raw of files) {
     const rel = raw.replace(/^\.\//, '')
-    if (!FIXTURE_FILE.test(rel) || !existsSync(join(ROOT, rel))) continue
+    if (!FIXTURE_FILE.test(rel)) continue
     let data
     try {
-      data = JSON.parse(readFileSync(join(ROOT, rel), 'utf-8'))
+      data = JSON.parse(readContent(rel, gitMode))
     } catch {
       continue // JSON validity is a test's job, not this gate's
     }
@@ -223,6 +241,7 @@ function checkFixtures(files, findings) {
  */
 export function scanRepo() {
   const files = trackedFiles()
+  const gitMode = files !== null
   const findings = []
   const list = files ?? walk('.')
   const seen = new Set()
@@ -230,8 +249,10 @@ export function scanRepo() {
     const norm = rel.replace(/^\.\//, '')
     if (seen.has(norm)) continue
     seen.add(norm)
-    if (!existsSync(join(ROOT, norm))) continue
-    scanPath(norm, findings)
+    // In git mode the index entry guarantees the path will be committed, even
+    // if it no longer exists on disk. Without git, only scan what exists.
+    if (!gitMode && !existsSync(join(ROOT, norm))) continue
+    scanPath(norm, findings, gitMode)
   }
   // A tracked .env or key file is always a finding, regardless of contents.
   for (const rel of seen) {
@@ -243,7 +264,7 @@ export function scanRepo() {
       findings.push({ file: rel, line: 1, label: 'Key material file', hint: name })
     }
   }
-  checkFixtures(list, findings)
+  checkFixtures(list, findings, gitMode)
   return findings
 }
 
