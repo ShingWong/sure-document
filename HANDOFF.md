@@ -160,15 +160,14 @@ which version to adopt.
 | Package | Version | State | Carries |
 |---|---|---|---|
 | `@shing.wong/sure-ui` | 0.3.6 | **published** | the `document` and `figure` blocks (classes, print rules, tokens only) |
-| `@shing.wong/sure-factor` | 0.6.0 | **published** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards |
+| `@shing.wong/sure-factor` | 0.6.0 → 0.6.1 | **0.6.0 published; 0.6.1 staging** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards; 0.6.1 adds ^0.3.6 dependency and live block validation |
 | `@shing.wong/sure-store/components` | — | not started | the first five catalog entries |
 | `@shing.wong/sure-document` | 0.0.0 | private, unpublished | Phase 0.5 harness only; renderer pending |
 
-Two follow-ups before adopting sure-factor 0.6.0 downstream: its lockfile still
-pins sure-ui 0.3.5, and the report-entry block check is deliberately deferred
-(`TODO(sure-ui-blocks)`) so the registry test does not demand an unpublished
-block. Once approved, bump the sure-ui dependency to ^0.3.6 and enable that
-check in a follow-up release.
+Both follow-ups are addressed in sure-factor 0.6.1 (merged and staging at the
+time of writing): the sure-ui dependency is ^0.3.6 and the report-entry block
+check is live against the installed `COMPONENTS`. Adopt 0.6.1, not 0.6.0, for
+downstream work.
 
 ## When you finish a phase
 
