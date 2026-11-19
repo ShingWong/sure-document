@@ -1,8 +1,15 @@
 node_modules
 dist
+coverage/
 *.tsbuildinfo
-.superpowers/
-graphify-out/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
 # Local agent memory: holds workspace-only config (UUID, local endpoints).
 # Provisioned per workspace, never shipped.
 .positronic/
+.superpowers/
+graphify-out/
