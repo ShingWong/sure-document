@@ -161,7 +161,7 @@ which version to adopt.
 |---|---|---|---|
 | `@shing.wong/sure-ui` | 0.3.6 | **published** | the `document` and `figure` blocks (classes, print rules, tokens only) |
 | `@shing.wong/sure-factor` | 0.6.1 | **published** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards, ^0.3.6 dependency and live block validation |
-| `@shing.wong/sure-store` | 0.4.1 | **staged, awaiting owner's 2FA approval** (GitHub repo public, CI green) | the first five document entries with synthetic fixture goldens and a replay suite |
+| `@shing.wong/sure-store` | 0.4.1 | **published** (GitHub repo public, `main` PR-protected) | the first five document entries with synthetic fixture goldens and a replay suite |
 | `@shing.wong/sure-document` | 0.0.0 | private, unpublished | Phase 0.5 harness only; renderer pending |
 
 Both follow-ups are addressed in sure-factor 0.6.1, which is published: the
@@ -177,7 +177,8 @@ gate, and a full public-history rewrite has not been performed.
 0.4.1's first Publish run failed with **E401** because npm had no trusted
 publisher for `@shing.wong/sure-store`. The owner added the GitHub Action
 publisher (owner `ShingWong`, repo `sure-store`, workflow `publish.yml`, no
-environment); the rerun staged 0.4.1 successfully.
+environment); the rerun staged 0.4.1 and the owner approved it. All three
+upstream packages are now published.
 
 ## When you finish a phase
 
