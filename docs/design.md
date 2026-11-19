@@ -95,8 +95,11 @@ Decisions:
 
 - **Points are canonical; named sizes are portrait.** Inch and millimetre
   inputs are converted once at parse (`1 in = 72 pt`, `1 mm = 72/25.4 pt`), and
-  `orientation` swaps the dimensions afterwards. Downstream code only ever sees
-  points, so a custom size and a named size are indistinguishable after parse.
+  `orientation` swaps the dimensions afterwards. Converted values are rounded to
+  **4 decimal places** at that single parse, before serialization or the capture
+  hash, so a millimetre input and its point equivalent produce identical bytes
+  (A8, A19b). Downstream code only ever sees points, so a custom size and a named
+  size are indistinguishable after parse.
 - **A unit mistake fails loudly.** `612 × 792` in `mm`, or `8.5 × 11` in `pt`,
   is a typo that would otherwise print a 21-inch page (`E_PAPER`, with the likely
   unit in the hint). Bounds: 72 pt to 14400 pt per side.

@@ -80,7 +80,7 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 | **A5 guards** | given rows whose sum disagrees with the recomputed total, then `E_GUARD` and no output | the failure Jasper could not detect |
 | **A6 pagination** | given 0, 1, 10, 11 and 40 rows, then the page count, repeated header and keep-together are as specified | a page that splits a signature block |
 | **A7 figures** | given a series, then the SVG has `<title>`/`<desc>`, a table fallback, and no colour-only encoding; on paper the fallback is hidden unless the layout opts in; given 6 slices to a donut, then a refusal | an unreadable chart on a grayscale printer, or a chart and its table printed back-to-back |
-| **A8 determinism** | given the same layout and data, then two renders are byte-identical | a diff on every run, so nobody reads the diff |
+| **A8 determinism** | given the same layout and data, then two renders are byte-identical, including converted dimensions rounded once at parse (4 decimal places) before serialization or the capture hash | a diff on every run, so nobody reads the diff |
 | **A9 purity** | given a render with `fetch`, `Date.now` and `Intl` stubbed to throw, then it still succeeds | hidden I/O and locale dependence |
 | **A10 agent envelope** | given `--agent` and a forced failure, then stdout is one JSON envelope, the error is in the event journal, and the exit code is the documented one | an agent parsing prose |
 | **A11 leak gate** | given the repository, then every fixture is `synthetic`, seeded, and free of identifier patterns | a client's data in a public package |
@@ -94,7 +94,7 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 | **A18 logo** | given an inline SVG with `monochrome`, then it renders in `currentColor`, keeps its aspect ratio, exposes `alt`, and falls back to a wordmark when the asset is absent | a broken-image box on a legal form |
 
 | **A19 paper** | given **every** named size, when printed to PDF, then the page box equals the table's points (letter 612×792, legal 612×1008, a4 595.28×841.89, …); a fixed design on any other paper, or a mixed orientation without a declaration, fails `E_PAPER` | a legal form printed on the wrong stock, discovered by a customer |
-| **A19b custom sizes** | given `{unit:"in",w:5.5,h:8.5}`, `{unit:"mm",w:139.7,h:215.9}` and `{unit:"pt",w:396,h:612}`, then all three render an identical 396×612 pt page; given `{unit:"mm",w:612,h:792}` or `{unit:"pt",w:8.5,h:11}`, then `E_PAPER` with the likely unit in the hint; given `size: "lette"`, then the hint lists the valid names | a page 21 inches wide, or a stamp, printed from a unit typo |
+| **A19b custom sizes** | given `{unit:"in",w:5.5,h:8.5}`, `{unit:"mm",w:139.7,h:215.9}` and `{unit:"pt",w:396,h:612}`, then all three render an identical 396×612 pt page, with every converted value rounded to 4 decimal places at parse before serialization; given `{unit:"mm",w:612,h:792}` or `{unit:"pt",w:8.5,h:11}`, then `E_PAPER` with the likely unit in the hint; given `size: "lette"`, then the hint lists the valid names | a page 21 inches wide, a stamp printed from a unit typo, or three "equal" sizes whose floats differ in the last place |
 | **A20 binding** | given `gutter: 36` on the left, then the body is exactly 36 pt narrower and no element crosses the binding edge; `mirror` alternates the gutter on odd/even sheets; a gutter that leaves a body under 72 pt fails `E_BINDING`; cut marks print in the margin and are clipped from the body | text running into the binding, or a coupon cut through its amount |
 | **A21 scale vs zoom** | given a fixed layout with `scale: 0.97`, then `E_SCALE`; given a flow document with `fit: width`, then `appliedScale` is recorded in the capture and is identical across runs; given preview zoom at 50% and 200%, then the PDF bytes are identical | a form scaled by 3% at the printer, and nobody noticing until the signature boxes are 4 mm off |
 
@@ -114,9 +114,14 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 | **A32 measurement determinism** | given the same layout and data rendered with the declared type tokens, then identical sheet boundaries regardless of the host's fonts or locale; given a font not resolvable from those tokens, then a render-time failure rather than silent host-font substitution | a document measured with one font and painted with another, wrapping differently in the browser |
 | **A33 table splits** | given a table spanning three sheets, then `<thead>` repeats on each continued sheet and no row crosses a boundary; given a row taller than the printable body, then `E_LAYOUT` | a continued table whose data rows have no headings, or a row clipped at the trim |
 
-A12, A14 and A18 need a browser; they belong to the consumer's browser suite,
-not to the dependency-free unit tests. They are listed here so they are not
-forgotten.
+**Where each test runs.** The dependency-free unit suite asserts emitted
+HTML/CSS rules, structural facts and numeric conversions: the `@page { size: … }`
+declaration, `appliedScale`, the shape of `sheets[]`, and the rounded point values
+in A19b. Assertions about the *compiled artefact* — a PDF MediaBox (A19, A23),
+identical PDF bytes (A21, A31), and imposition (A25) — plus the printed half of
+A14, need a headless browser/PDF runner and belong to the consumer's suite, as do
+A12 and A18. They are all listed here so they are not forgotten; the split keeps
+the unit tests independent of a browser.
 
 ## 4. What "accepted" means for the project
 
@@ -131,4 +136,4 @@ forgotten.
 6. A legal form **prints at 1:1 on the paper it declares** — same size, same
    orientation, no gutter eating the body, no scale (A19–A21).
 
-Anything else is a feature. These four are the reason the package exists.
+Anything else is a feature. These six are the reason the package exists.
