@@ -119,3 +119,34 @@ describe('checkExamples', () => {
     expect(problems).toMatch(/no expectations/)
   })
 })
+
+describe('security gate patterns', () => {
+  // The gate fails closed, so its own patterns need tests: two of them were
+  // wrong in the first release and nothing noticed, because the only consumer
+  // of the gate is the hook and CI — both of which were green.
+  it('finds the commonest internal range, at four octets', async () => {
+    const { scanText } = await import('../scripts/security-check.mjs')
+    for (const host of ['192.168.4.53', '10.0.0.19', '172.16.0.1']) {
+      expect(scanText(`host ${host}`, 'docs/x.md').map((f) => f.label)).toContain('Private IP address')
+    }
+    // A public address is not a finding.
+    expect(scanText('host 69.45.229.53', 'docs/x.md')).toEqual([])
+  })
+
+  it('does not report a long decimal as a card number', async () => {
+    const { scanText } = await import('../scripts/security-check.mjs')
+    // A money figure such as 1480.8000000000002 contains a 13-digit run that
+    // passes Luhn; reporting floats as cards buries the real findings.
+    expect(scanText('{"totalDP": 1480.8000000000002}', 'examples/x.json')).toEqual([])
+    // A real card still fires.
+    expect(scanText('card 4111111111111111', 'docs/x.md').map((f) => f.label)).toContain('Card number')
+  })
+
+  it('treats a licence header as a declaration and prose as a leak', async () => {
+    const { scanText } = await import('../scripts/security-check.mjs')
+    const header = scanText('// Copyright (c) 2026 Someone <owner@real-company.com>.', 'src/x.ts')
+    expect(header).toEqual([])
+    const prose = scanText('Write to owner@real-company.com for access.', 'docs/x.md')
+    expect(prose.map((f) => f.label)).toContain('Email address')
+  })
+})
