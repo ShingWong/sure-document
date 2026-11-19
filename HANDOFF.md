@@ -159,14 +159,17 @@ which version to adopt.
 
 | Package | Version | State | Carries |
 |---|---|---|---|
-| `@shing.wong/sure-ui` | 0.3.6 | **published** | the `document` and `figure` blocks (classes, print rules, tokens only) |
-| `@shing.wong/sure-factor` | 0.6.1 | **published** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards, ^0.3.6 dependency and live block validation |
+| `@shing.wong/sure-ui` | 0.3.7 | **published** | the `document` and `figure` blocks, plus `SURE_TYPOGRAPHY` as the sole typography source |
+| `@shing.wong/sure-factor` | 0.6.2 | **staged, awaiting owner's 2FA approval** | the five catalog keys, report contract, live block validation, and the strict `@`/`.` guard grammar |
 | `@shing.wong/sure-store` | 0.4.1 | **published** (GitHub repo public, `main` PR-protected) | the first five document entries with synthetic fixture goldens and a replay suite |
 | `@shing.wong/sure-document` | 0.0.0 | private, unpublished | Phase 0.5 harness only; renderer pending |
 
-Both follow-ups are addressed in sure-factor 0.6.1, which is published: the
-sure-ui dependency is ^0.3.6 and the report-entry block check is live against
-the installed `COMPONENTS`. Adopt 0.6.1, not 0.6.0, for downstream work.
+The follow-ups were addressed in 0.6.1 (^0.3.6 dependency, live block check).
+The coordinated grammar release is 0.6.2 — strict `@`/`.` sigils, five
+aggregates, `ifpresent`, `E_SCOPE_INVALID` parity, no `P:`/`F:` — because 0.6.1
+is already published. Adopt 0.6.2 for downstream work. sure-ui 0.3.7 exports
+`SURE_TYPOGRAPHY`; sure-document binds its print-side resolution map to that
+export at compile time, with zero runtime dependencies.
 
 `sure-store` was made public when its contract stabilized; `main` is now
 PR-protected. Its security gate checks commit identities in history, so new

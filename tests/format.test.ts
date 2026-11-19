@@ -1,7 +1,13 @@
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { SURE_TYPOGRAPHY } from '@shing.wong/sure-ui'
 import { DocumentError } from '../src/errors.ts'
 import {
   FONT_TOKENS,
+  SURE_DOCUMENT_TYPOGRAPHY,
   createMeasurementOracle,
   evaluate,
   formatCurrency,
@@ -9,11 +15,16 @@ import {
   formatNumber,
   isFontToken,
 } from '../src/format.ts'
+import { checkTypography } from '../scripts/check-typography.mjs'
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const tempRoots: string[] = []
 
 afterEach(() => {
   vi.useRealTimers()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+  while (tempRoots.length > 0) rmSync(tempRoots.pop()!, { recursive: true, force: true })
 })
 
 /** Assert the stable code, not a message spelling. */
@@ -29,69 +40,140 @@ function expectCode(run: () => unknown, code: string): DocumentError {
   throw new Error(`expected ${code}, but nothing was thrown`)
 }
 
+const rows = [{ amount: 10, principal: 20 }, { amount: 20, principal: 30 }, { amount: 30, principal: 50 }]
+const context = {
+  params: {
+    rate: 42,
+    label: 'ok',
+    empty: null,
+    initial: 100,
+    price: 3,
+    total: 100,
+    count: 20,
+    flag: 1,
+    discount: 0,
+    rows,
+    totals: { grand: 60, tax: 5 },
+    TotalDP: 100,
+  },
+  row: { amount: 120, note: '', qty: 10, deduction: 40, count: 4 },
+}
+
 describe('evaluate — the closed vocabulary (design §5, A3)', () => {
-  it('reads a parameter with P:', () => {
-    expect(evaluate('P:Rate', { params: { Rate: 42 } })).toBe(42)
-    expect(evaluate('P:Label', { params: { Label: 'ok' } })).toBe('ok')
-    expect(evaluate('P:Empty', { params: { Empty: null } })).toBeNull()
+  it('reads parameters from @name and root.name', () => {
+    expect(evaluate('@rate', context)).toBe(42)
+    expect(evaluate('root.rate', context)).toBe(42)
+    expect(evaluate('@label', context)).toBe('ok')
+    expect(evaluate('@empty', context)).toBeNull()
   })
 
-  it('reads a row field with F:', () => {
-    expect(evaluate('F:amount', { row: { amount: 120 } })).toBe(120)
+  it('reads row fields from .name and row.name', () => {
+    expect(evaluate('.amount', context)).toBe(120)
+    expect(evaluate('row.amount', context)).toBe(120)
+    expect(evaluate('.note', context)).toBe('')
   })
 
-  it('adds parameters with sum:', () => {
-    expect(evaluate('sum:A,B,C', { params: { A: 1, B: 2, C: 3.5 } })).toBe(6.5)
-    expect(evaluate('sum:P:A,F:B', { params: { A: 10 }, row: { B: 5 } })).toBe(15)
+  it('reads server totals from the explicit totals namespace', () => {
+    expect(evaluate('totals.grand', context)).toBe(60)
+    expect(evaluate('totals.tax', context)).toBe(5)
   })
 
-  it('subtracts with sub:', () => {
-    expect(evaluate('sub:A,B', { params: { A: 10, B: 3.25 } })).toBe(6.75)
-    expect(evaluate('sub:P:Gross,F:Deduction', { params: { Gross: 100 }, row: { Deduction: 40 } })).toBe(60)
+  it('takes raw numeric literals as numbers, never as names', () => {
+    expect(evaluate('100', {})).toBe(100)
+    expect(evaluate('0.05', {})).toBe(0.05)
+    expect(evaluate('-3', {})).toBe(-3)
   })
 
-  it('returns null when an ifpresent guard is absent or null', () => {
-    expect(evaluate('ifpresent:P:Guard->P:Value', { params: { Guard: null, Value: 7 } })).toBeNull()
-    expect(evaluate('ifpresent:P:Missing->P:Value', { params: { Value: 7 } })).toBeNull()
-    expect(evaluate('ifpresent:F:Missing->F:Value', { row: { Value: 7 } })).toBeNull()
+  it('evaluates all five aggregates over comma-separated operands', () => {
+    expect(evaluate('sum: @initial, @price, 7', context)).toBe(110)
+    expect(evaluate('sub: @initial, .deduction', context)).toBe(60)
+    expect(evaluate('mul: .qty, @price', context)).toBe(30)
+    expect(evaluate('div: @total, .count', context)).toBe(25)
+    expect(evaluate('avg: @initial, @price, 8', context)).toBe(37)
   })
 
-  it('returns the value when the guard is present, including 0 and empty string', () => {
-    expect(evaluate('ifpresent:P:Guard->P:Value', { params: { Guard: 0, Value: 7 } })).toBe(7)
-    expect(evaluate('ifpresent:P:Guard->P:Value', { params: { Guard: '', Value: 'yes' } })).toBe('yes')
+  it('accepts an explicit rows.field range as an aggregate operand', () => {
+    expect(evaluate('sum: rows.amount', context)).toBe(60)
+    expect(evaluate('avg: rows.amount', context)).toBe(20)
+    expect(evaluate('sum: rows.amount, @price', context)).toBe(63)
+    expect(evaluate('sub: @initial, sum: rows.principal', context)).toBe(0)
   })
 
-  it('accepts any expression form as the Then of ifpresent', () => {
-    expect(evaluate('ifpresent:P:Guard->sum:A,B', { params: { Guard: 1, A: 2, B: 3 } })).toBe(5)
-    expect(evaluate('ifpresent:P:Guard->F:amount', { params: { Guard: 1 }, row: { amount: 9 } })).toBe(9)
-    expect(evaluate('ifpresent:P:Guard->bare', { params: { Guard: 1, bare: 11 } })).toBe(11)
+  it('treats parentheses as one operand, so a nested aggregate may carry commas', () => {
+    expect(evaluate('div: (sum: @initial, @price), @count', context)).toBe(5.15)
+    expect(evaluate('sum: (sub: @initial, .deduction), @price', context)).toBe(63)
   })
 
-  it('throws E_EXPR for an unknown form and lists the supported forms', () => {
-    const error = expectCode(() => evaluate('upper:A', { params: { A: 1 } }), 'E_EXPR')
-    expect(error.hint).toMatch(/P:, F:, sum:, sub:, ifpresent:/)
+  it('keeps ifpresent as the only conditional and any expression as its Then', () => {
+    expect(evaluate('ifpresent: @discount -> @discount', context)).toBe(0)
+    expect(evaluate('ifpresent: .note -> .note', context)).toBe('')
+    expect(evaluate('ifpresent: @flag -> sum: @initial, @price', context)).toBe(103)
+    expect(evaluate('ifpresent: @flag -> 100', context)).toBe(100)
+    expect(evaluate('ifpresent: @flag -> totals.grand', context)).toBe(60)
   })
 
-  it('throws E_EXPR with the nearest supplied name for a misspelt parameter', () => {
-    const error = expectCode(() => evaluate('P:TotlDP', { params: { TotalDP: 100 } }), 'E_EXPR')
-    expect(error.hint).toMatch(/did you mean P:TotalDP\?/)
+  it('returns null when an ifpresent guard is null', () => {
+    expect(evaluate('ifpresent: @empty -> @rate', context)).toBeNull()
+    expect(evaluate('ifpresent: .note -> @rate', { params: { rate: 42 }, row: { note: null } })).toBeNull()
   })
 
-  it('throws E_EXPR for a missing parameter or field', () => {
-    expectCode(() => evaluate('P:Absent', { params: { Other: 1 } }), 'E_EXPR')
-    expectCode(() => evaluate('F:absent', { row: { other: 1 } }), 'E_EXPR')
-    expectCode(() => evaluate('ifpresent:P:Guard->P:Absent', { params: { Guard: 1 } }), 'E_EXPR')
+  it('throws E_SCOPE_INVALID for removed P: and F: forms', () => {
+    for (const expr of ['P:rate', 'F:amount', 'sum:P:a,F:b', 'ifpresent:P:flag->@rate', '@rate -> F:amount']) {
+      const error = expectCode(() => evaluate(expr, context), 'E_SCOPE_INVALID')
+      expect(error.hint).toMatch(/use @name for parameters or \.name for row fields/)
+    }
+  })
+
+  it('throws E_SCOPE_INVALID for bare identifiers and unknown namespaces', () => {
+    for (const expr of ['rate', 'totals', '@rate -> amount', 'customer.name', 'sum: bare, @rate']) {
+      expectCode(() => evaluate(expr, context), 'E_SCOPE_INVALID')
+    }
+    expectCode(() => evaluate('@rate -> amount', context), 'E_SCOPE_INVALID')
+  })
+
+  it('throws E_SCOPE_INVALID for a .field with no active row', () => {
+    for (const expr of ['.amount', 'row.amount', 'avg: rows.amount']) {
+      expectCode(() => evaluate(expr, { params: { rows } }), 'E_SCOPE_INVALID')
+    }
+    const noRows = expectCode(() => evaluate('.amount', { params: { rate: 1 } }), 'E_SCOPE_INVALID')
+    expect(noRows.hint).toMatch(/supply a row/)
+  })
+
+  it('throws E_SCOPE_INVALID for a @field that does not exist, naming the near miss', () => {
+    const error = expectCode(() => evaluate('@TotlDP', context.params ? context : {}), 'E_SCOPE_INVALID')
+    expect(error.hint).toMatch(/did you mean @TotalDP\?/)
+    expectCode(() => evaluate('root.absent', context), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('totals.absent', context), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('totals.grand', { params: {} }), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('ifpresent: @absent -> @rate', context), 'E_SCOPE_INVALID')
+  })
+
+  it('throws E_SCOPE_INVALID for a row field, range member or guard outside scope', () => {
+    expectCode(() => evaluate('.absent', context), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('row.absent', context), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('sum: rows.absent', context), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('@rate', { ...context, params: { rows: 'not-rows' } }), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('ifpresent: bare -> @rate', context), 'E_SCOPE_INVALID')
+  })
+
+  it('throws E_EXPR for an unknown form with the supported forms in the hint', () => {
+    const error = expectCode(() => evaluate('upper:rate', context), 'E_EXPR')
+    expect(error.hint).toMatch(/sum:, sub:, mul:, div:, avg:, ifpresent:/)
   })
 
   it('throws E_EXPR for malformed forms and non-numeric operands', () => {
     expectCode(() => evaluate('', {}), 'E_EXPR')
-    expectCode(() => evaluate('P:', {}), 'E_EXPR')
-    expectCode(() => evaluate('sum:A,', { params: { A: 1 } }), 'E_EXPR')
-    expectCode(() => evaluate('sub:A', { params: { A: 1 } }), 'E_EXPR')
-    expectCode(() => evaluate('sub:A,B,C', { params: { A: 1, B: 2, C: 3 } }), 'E_EXPR')
-    expectCode(() => evaluate('ifpresent:A', {}), 'E_EXPR')
-    expectCode(() => evaluate('sum:A,B', { params: { A: 1, B: '1,500.00' } }), 'E_EXPR')
-    expectCode(() => evaluate('P:Bad', { params: { Bad: { nested: true } } }), 'E_EXPR')
+    expectCode(() => evaluate('sum:', {}), 'E_EXPR')
+    expectCode(() => evaluate('sum:@initial,', context), 'E_EXPR')
+    expectCode(() => evaluate('sub:@initial', context), 'E_EXPR')
+    expectCode(() => evaluate('div:@total', context), 'E_EXPR')
+    expectCode(() => evaluate('sum:@initial, @label', context), 'E_EXPR')
+    expectCode(() => evaluate('div:@total, 0', context), 'E_EXPR')
+    expectCode(() => evaluate('sum:@bad', { params: { bad: { nested: true } } }), 'E_EXPR')
+    expectCode(() => evaluate('ifpresent:@flag', context), 'E_EXPR')
+    expectCode(() => evaluate('ifpresent: -> @rate', context), 'E_EXPR')
+    expectCode(() => evaluate('ifpresent:@flag -> ', context), 'E_EXPR')
+    expectCode(() => evaluate('rows.amount', context), 'E_SCOPE_INVALID')
   })
 })
 
@@ -190,19 +272,54 @@ describe('purity — A2, A9, A17', () => {
   })
 })
 
-describe('measurement oracle — A32', () => {
-  it('has a small closed set of declared font tokens', () => {
-    expect(FONT_TOKENS).toEqual(['body', 'heading', 'caption', 'mono'])
+describe('typography — sure-ui is the sole source of truth (design §9, A32)', () => {
+  it('re-exports a generated map identical to SURE_TYPOGRAPHY', () => {
+    expect(SURE_DOCUMENT_TYPOGRAPHY).toEqual(SURE_TYPOGRAPHY)
+    expect(Object.keys(SURE_DOCUMENT_TYPOGRAPHY)).toEqual([
+      'heading1', 'heading2', 'body', 'caption', 'mono',
+    ])
+    for (const style of Object.values(SURE_DOCUMENT_TYPOGRAPHY)) {
+      expect(style.css).toMatch(/^var\(--sure-font-/)
+      expect(typeof style.css).toBe('string')
+      expect(Number.isFinite(style.ptSize)).toBe(true)
+      expect(Number.isFinite(style.linePt)).toBe(true)
+      expect(Number.isFinite(style.weight)).toBe(true)
+    }
+    expect(SURE_DOCUMENT_TYPOGRAPHY.body).toEqual({
+      css: 'var(--sure-font-body)', ptSize: 10, linePt: 14, weight: 400,
+    })
+  })
+
+  it('derives token names from the map, with no ad-hoc list', () => {
+    expect(FONT_TOKENS).toEqual(Object.keys(SURE_TYPOGRAPHY))
     expect(isFontToken('body')).toBe(true)
+    expect(isFontToken('caption')).toBe(true)
+    expect(isFontToken('heading')).toBe(false) // removed ad-hoc token
     expect(isFontToken('Comic Sans MS')).toBe(false)
   })
 
-  it('delegates to the injected measurer for a declared token', () => {
+  it('passes the pt metrics from the map to the injected measurer', () => {
     const measure = vi.fn(() => ({ width: 72, height: 14 }))
     const oracle = createMeasurementOracle(measure)
-    const input = { text: 'hello', fontFamily: 'body', fontSize: 10, lineHeight: 14, maxWidth: 200 }
+    const input = { text: 'hello', fontFamily: 'body', fontSize: 999, lineHeight: 999, maxWidth: 200 }
     expect(oracle(input)).toEqual({ width: 72, height: 14 })
-    expect(measure).toHaveBeenCalledWith(input)
+    expect(measure).toHaveBeenCalledWith({
+      ...input,
+      fontSize: SURE_DOCUMENT_TYPOGRAPHY.body.ptSize,
+      lineHeight: SURE_DOCUMENT_TYPOGRAPHY.body.linePt,
+    })
+  })
+
+  it('uses the metrics of whichever declared token the renderer passes', () => {
+    const measure = vi.fn((input: { fontFamily: string }) => ({ width: input.fontFamily.length, height: 1 }))
+    const oracle = createMeasurementOracle(measure)
+    for (const key of FONT_TOKENS) {
+      const style = SURE_DOCUMENT_TYPOGRAPHY[key]
+      oracle({ text: 'x', fontFamily: key, fontSize: 1, lineHeight: 1, maxWidth: 100 })
+      expect(measure).toHaveBeenLastCalledWith({
+        text: 'x', fontFamily: key, fontSize: style.ptSize, lineHeight: style.linePt, maxWidth: 100,
+      })
+    }
   })
 
   it('throws E_FONT and never measures an unresolvable token', () => {
@@ -210,7 +327,22 @@ describe('measurement oracle — A32', () => {
     const oracle = createMeasurementOracle(measure)
     const input = { text: 'hello', fontFamily: 'Comic Sans MS', fontSize: 10, lineHeight: 14, maxWidth: 200 }
     const error = expectCode(() => oracle(input), 'E_FONT')
-    expect(error.hint).toMatch(/body, heading, caption, mono/)
+    expect(error.hint).toMatch(/heading1, heading2, body, caption, mono/)
     expect(measure).not.toHaveBeenCalled()
+  })
+
+  it('keeps the checked-in generated module in sync with installed sure-ui', () => {
+    expect(checkTypography(ROOT)).toEqual([])
+    expect(readFileSync(join(ROOT, 'src', 'typography.generated.ts'), 'utf8')).toContain('SURE_DOCUMENT_TYPOGRAPHY')
+  })
+
+  it('detects a stale generated module and leaves a regenerated copy to diff', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sure-document-typography-test-'))
+    tempRoots.push(root)
+    const write = (file: string, text: string) => writeFileSync(join(root, file), text, 'utf8')
+    write('src/typography.generated.ts', 'export const SURE_DOCUMENT_TYPOGRAPHY = {}\n')
+    const problems = checkTypography(root).join('\n')
+    expect(problems).toMatch(/stale/)
+    expect(problems).toMatch(/regenerated:/)
   })
 })

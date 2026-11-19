@@ -32,13 +32,16 @@
     "test": "vitest run",
     "fixtures": "tsx fixtures/generate.ts",
     "fixtures:examples": "tsx scripts/make-examples.mjs",
+    "typography:generate": "node scripts/generate-typography.mjs",
+    "check:typography": "node scripts/check-typography.mjs",
     "check:exports": "node scripts/check-exports.mjs",
     "check:errors": "node scripts/check-errors.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:examples": "node scripts/check-examples.mjs",
-    "verify": "npm run lint && npm run build && npm test && npm run check:errors && npm run check:docs && npm run check:examples && npm run check:exports"
+    "verify": "npm run lint && npm run build && npm test && npm run check:errors && npm run check:typography && npm run check:docs && npm run check:examples && npm run check:exports"
   },
   "devDependencies": {
+    "@shing.wong/sure-ui": "0.3.7",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0",

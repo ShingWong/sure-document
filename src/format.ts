@@ -4,10 +4,17 @@
  *
  * Pure and dependency-free: no clock, host locale, `Intl`, DOM or dynamic code
  * execution. Every value and every pattern is supplied by the caller, so the
- * same inputs always produce the same paper (A8, A9, A17).
+ * same inputs always produce the same paper (A8, A9, A17). Typography values
+ * come from a checked-in resolution of sure-ui's `SURE_TYPOGRAPHY`, never from
+ * a second, hand-maintained token dictionary.
  */
 
 import { fail } from './errors.js'
+import { SURE_DOCUMENT_TYPOGRAPHY } from './typography.generated.js'
+import type { SureDocumentTypographyKind } from './typography.generated.js'
+
+export { SURE_DOCUMENT_TYPOGRAPHY } from './typography.generated.js'
+export type { SureDocumentTypographyKind, SureDocumentTypographyStyle } from './typography.generated.js'
 
 /** The caller-supplied values an expression may read (`design §5`). */
 export interface EvalContext {
@@ -18,38 +25,39 @@ export interface EvalContext {
 /** The only value types an expression can produce. */
 export type Scalar = string | number | null
 
-type Source = 'P' | 'F' | ''
-
 // ---------------------------------------------------------------------------
-// Expressions — a fixed micro-parser, never an evaluator.
+// Expressions — a fixed micro-parser, never an evaluator (design §5, A3).
 // ---------------------------------------------------------------------------
 
-function toScalar(value: unknown, source: Source, name: string): Scalar {
-  if (value === null || value === undefined) return null
-  if (typeof value === 'string' || typeof value === 'number') return value
-  return fail(
-    'E_EXPR',
-    `${source}${name} is not a string, number or null`,
-    `supply a scalar value for ${source}${name}`,
-    { expr: `${source}${name}` },
-  )
+type Scope = 'param' | 'row' | 'totals' | 'rows'
+type Aggregate = 'sum' | 'sub' | 'mul' | 'div' | 'avg'
+
+interface Ref {
+  scope: Scope
+  name: string
 }
 
-function lookup(name: string, ctx: EvalContext, source: Source): { found: boolean; value: Scalar } {
-  const maps: Array<Record<string, unknown> | undefined> =
-    source === 'P' ? [ctx.params] : source === 'F' ? [ctx.row] : [ctx.params, ctx.row]
-  for (const map of maps) {
-    if (map && Object.prototype.hasOwnProperty.call(map, name)) {
-      return { found: true, value: toScalar(map[name], source, name) }
-    }
+const AGGREGATES: readonly Aggregate[] = ['sum', 'sub', 'mul', 'div', 'avg']
+const NUMERIC_LITERAL = /^-?(?:0|[1-9]\d*)(?:\.\d+)?$/
+
+const SUPPORTED_FORMS = 'sum:, sub:, mul:, div:, avg:, ifpresent:'
+const SCOPE_FORMS = '@name, root.name, .name, row.name, totals.name; numbers are literals'
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function own(map: Record<string, unknown>, name: string): boolean {
+  return Object.prototype.hasOwnProperty.call(map, name)
+}
+
+function refLabel(ref: Ref): string {
+  switch (ref.scope) {
+    case 'param': return `@${ref.name}`
+    case 'row': return `.${ref.name}`
+    case 'totals': return `totals.${ref.name}`
+    case 'rows': return `rows.${ref.name}`
   }
-  return { found: false, value: null }
-}
-
-function candidateNames(ctx: EvalContext, source: Source): string[] {
-  if (source === 'P') return Object.keys(ctx.params ?? {})
-  if (source === 'F') return Object.keys(ctx.row ?? {})
-  return [...new Set([...Object.keys(ctx.params ?? {}), ...Object.keys(ctx.row ?? {})])]
 }
 
 function editDistance(a: string, b: string): number {
@@ -83,126 +91,288 @@ function nearestName(query: string, names: string[]): string | undefined {
   return bestDistance <= threshold ? best : undefined
 }
 
-function requireScalar(name: string, ctx: EvalContext, source: Source): Scalar {
-  if (name.length === 0) {
-    return fail('E_EXPR', 'empty name', `supply a name after ${source || 'the expression'}`, { expr: source })
+function suggestion(ref: Ref, ctx: EvalContext): string | undefined {
+  const totals = ctx.params?.totals
+  const names = ref.scope === 'param'
+    ? Object.keys(ctx.params ?? {})
+    : ref.scope === 'row'
+      ? Object.keys(ctx.row ?? {})
+      : ref.scope === 'totals' && isRecord(totals)
+        ? Object.keys(totals)
+        : []
+  const near = nearestName(ref.name, names)
+  return near === undefined ? undefined : `did you mean ${refLabel({ scope: ref.scope, name: near })}?`
+}
+
+function toScalar(value: unknown, label: string, expr: string): Scalar {
+  if (value === null || value === undefined) return null
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  return fail(
+    'E_EXPR',
+    `${label} is not a string, finite number or null`,
+    `supply a scalar value for ${label}`,
+    { expr },
+  )
+}
+
+/** `@`/`root.` are params, `.`/`row.` are the current row, `totals.` is explicit. */
+function parseRef(raw: string): Ref | undefined {
+  const text = raw.trim()
+  if (text.startsWith('@')) return { scope: 'param', name: text.slice(1).trim() }
+  if (text.startsWith('root.')) return { scope: 'param', name: text.slice(5).trim() }
+  if (text.startsWith('row.')) return { scope: 'row', name: text.slice(4).trim() }
+  if (text.startsWith('totals.')) return { scope: 'totals', name: text.slice(7).trim() }
+  if (text.startsWith('.')) return { scope: 'row', name: text.slice(1).trim() }
+  if (text.startsWith('rows.')) return { scope: 'rows', name: text.slice(5).trim() }
+  return undefined
+}
+
+function lookup(ref: Ref, ctx: EvalContext, expr: string): Scalar {
+  if (ref.name.length === 0) {
+    return fail('E_SCOPE_INVALID', `empty ${ref.scope} name`, 'supply a name, e.g. @total or .amount', { expr })
   }
-  const hit = lookup(name, ctx, source)
-  if (hit.found) return hit.value
-  const label = source ? `${source}:${name}` : name
-  const near = nearestName(name, candidateNames(ctx, source))
-  const nearLabel = near ? (source ? `${source}:${near}` : near) : undefined
-  const hint = nearLabel ? `did you mean ${nearLabel}?` : `supply ${label}`
-  return fail('E_EXPR', `missing ${label}`, hint, { expr: label })
-}
-
-/** Split the operand list of `sum:` / `sub:`; an empty slot is a hard error. */
-function splitOperands(body: string, form: string): string[] {
-  const parts = body.split(',').map((part) => part.trim())
-  if (parts.some((part) => part.length === 0)) {
-    return fail('E_EXPR', `${form} has an empty operand`, `use ${form}:A,B`, { expr: form })
+  if (ref.scope === 'param') {
+    if (!ctx.params || !own(ctx.params, ref.name)) {
+      return fail(
+        'E_SCOPE_INVALID',
+        `parameter ${refLabel(ref)} does not exist`,
+        suggestion(ref, ctx) ?? 'declare it in params',
+        { expr },
+      )
+    }
+    return toScalar(ctx.params[ref.name], refLabel(ref), expr)
   }
-  return parts
-}
-
-/** A reference may carry its own `P:` / `F:` prefix, or inherit a default. */
-function parseRef(raw: string): { source: Source; name: string } {
-  if (raw.startsWith('P:')) return { source: 'P', name: raw.slice(2) }
-  if (raw.startsWith('F:')) return { source: 'F', name: raw.slice(2) }
-  return { source: '', name: raw }
-}
-
-function numericOperand(raw: string, ctx: EvalContext): number {
-  const { source, name } = parseRef(raw)
-  const value = requireScalar(name, ctx, source === '' ? 'P' : source)
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return fail('E_EXPR', `operand "${raw}" is not a finite number`, `supply a numeric parameter for "${raw}"`, {
-      expr: raw,
-    })
+  if (ref.scope === 'row') {
+    if (!ctx.row) {
+      return fail(
+        'E_SCOPE_INVALID',
+        `row field ${refLabel(ref)} has no active row`,
+        'use @name for a parameter, or supply a row for .name / row.name',
+        { expr },
+      )
+    }
+    if (!own(ctx.row, ref.name)) {
+      return fail(
+        'E_SCOPE_INVALID',
+        `row field ${refLabel(ref)} does not exist`,
+        suggestion(ref, ctx) ?? 'declare it on the current row',
+        { expr },
+      )
+    }
+    return toScalar(ctx.row[ref.name], refLabel(ref), expr)
   }
-  return value
+  if (ref.scope === 'totals') {
+    const totals = ctx.params?.totals
+    if (!isRecord(totals) || !own(totals, ref.name)) {
+      return fail(
+        'E_SCOPE_INVALID',
+        `total ${refLabel(ref)} does not exist`,
+        suggestion(ref, ctx) ?? 'supply params.totals with that name',
+        { expr },
+      )
+    }
+    return toScalar(totals[ref.name], refLabel(ref), expr)
+  }
+  return fail(
+    'E_SCOPE_INVALID',
+    `${refLabel(ref)} is only valid as an aggregate operand`,
+    'use sum: rows.amount or avg: rows.amount',
+    { expr },
+  )
 }
 
-/** `guardPresent` is deliberately non-throwing: absence is the guard's point. */
-function guardPresent(raw: string, ctx: EvalContext): boolean {
-  const { source, name } = parseRef(raw)
-  if (name.length === 0) return false
-  const sources: Array<'P' | 'F'> = source === 'P' || source === 'F' ? [source] : ['P', 'F']
-  for (const from of sources) {
-    const map = from === 'P' ? ctx.params : ctx.row
-    if (map && Object.prototype.hasOwnProperty.call(map, name)) {
-      const value = map[name]
-      if (value !== null && value !== undefined) return true
+function removedForm(token: string): 'P' | 'F' | undefined {
+  const colon = token.indexOf(':')
+  if (colon === -1) return undefined
+  const form = token.slice(0, colon).trim()
+  return form === 'P' || form === 'F' ? form : undefined
+}
+
+/** Bare names and removed forms never fall back to a guessed scope. */
+function unscoped(token: string, expr: string, role: string): never {
+  const removed = removedForm(token)
+  if (removed) {
+    return fail(
+      'E_SCOPE_INVALID',
+      `removed form "${removed}:"`,
+      `use @name for parameters or .name for row fields, not ${removed}:`,
+      { expr },
+    )
+  }
+  return fail(
+    'E_SCOPE_INVALID',
+    `${role} "${token}" has no explicit scope`,
+    `use ${SCOPE_FORMS}`,
+    { expr },
+  )
+}
+
+function numericLiteral(text: string): number | undefined {
+  return NUMERIC_LITERAL.test(text) ? Number(text) : undefined
+}
+
+function isAggregate(text: string): text is `${Aggregate}:${string}` {
+  const colon = text.indexOf(':')
+  return colon > 0 && (AGGREGATES as readonly string[]).includes(text.slice(0, colon).trim())
+}
+
+/** Parentheses group one operand, so a nested aggregate may carry its own commas. */
+function splitOperands(body: string, form: Aggregate, expr: string): string[] {
+  const parts: string[] = []
+  let depth = 0
+  let start = 0
+  for (let i = 0; i < body.length; i += 1) {
+    const ch = body[i]
+    if (ch === '(') depth += 1
+    else if (ch === ')') {
+      depth -= 1
+      if (depth < 0) {
+        return fail('E_EXPR', `${form} has unbalanced parentheses`, 'use (sum: A, B) as one operand', { expr })
+      }
+    } else if (ch === ',' && depth === 0) {
+      parts.push(body.slice(start, i))
+      start = i + 1
     }
   }
-  return false
+  if (depth !== 0) {
+    return fail('E_EXPR', `${form} has unbalanced parentheses`, 'use (sum: A, B) as one operand', { expr })
+  }
+  parts.push(body.slice(start))
+  const cleaned = parts.map((part) => part.trim())
+  if (cleaned.some((part) => part.length === 0)) {
+    return fail('E_EXPR', `${form} has an empty operand`, `use ${form}:A,B`, { expr })
+  }
+  return cleaned.map((part) => part.startsWith('(') && part.endsWith(')') ? part.slice(1, -1).trim() : part)
 }
 
-/** The `Then` of `ifpresent:` may be any expression form, or a bare name. */
-function evalThen(raw: string, ctx: EvalContext): Scalar {
-  const colon = raw.indexOf(':')
-  const form = colon === -1 ? '' : raw.slice(0, colon)
-  if (form === 'P' || form === 'F' || form === 'sum' || form === 'sub' || form === 'ifpresent') {
-    return evaluate(raw, ctx)
+/** `rows.amount` is an explicit range: every row in params.rows supplies one number. */
+function rangeNumbers(ref: Ref, ctx: EvalContext, expr: string): number[] {
+  const rows = ctx.params?.rows
+  if (!Array.isArray(rows)) {
+    return fail('E_SCOPE_INVALID', `${refLabel(ref)} has no rows parameter`, 'supply params.rows as an array of records', { expr })
   }
-  return requireScalar(raw, ctx, '')
+  if (ref.name.length === 0) {
+    return fail('E_SCOPE_INVALID', 'empty rows range field', 'use rows.amount', { expr })
+  }
+  return rows.map((row, index) => {
+    if (!isRecord(row) || !own(row, ref.name)) {
+      return fail(
+        'E_SCOPE_INVALID',
+        `rows[${index}].${ref.name} does not exist`,
+        `declare ${ref.name} on every row in params.rows`,
+        { expr },
+      )
+    }
+    const value = toScalar(row[ref.name], refLabel(ref), expr)
+    if (typeof value !== 'number') {
+      return fail('E_EXPR', `${refLabel(ref)} is not numeric`, 'supply numbers for an aggregate range', { expr })
+    }
+    return value
+  })
+}
+
+function operandNumbers(raw: string, ctx: EvalContext, expr: string): number[] {
+  const token = raw.trim()
+  const literal = numericLiteral(token)
+  if (literal !== undefined) return [literal]
+  const ref = parseRef(token)
+  if (ref?.scope === 'rows') return rangeNumbers(ref, ctx, expr)
+  if (ref) {
+    const value = lookup(ref, ctx, expr)
+    if (typeof value !== 'number') {
+      return fail('E_EXPR', `operand "${token}" is not a finite number`, 'supply a numeric value for this operand', { expr })
+    }
+    return [value]
+  }
+  if (isAggregate(token)) {
+    const value = evaluate(token, ctx)
+    if (typeof value !== 'number') {
+      return fail('E_EXPR', `operand "${token}" is not a finite number`, 'supply a numeric value for this operand', { expr })
+    }
+    return [value]
+  }
+  return unscoped(token, expr, 'operand')
+}
+
+function evaluateAggregate(form: Aggregate, body: string, ctx: EvalContext, expr: string): Scalar {
+  const operands = splitOperands(body, form, expr)
+  if ((form === 'sub' || form === 'div') && operands.length < 2) {
+    return fail('E_EXPR', `${form} needs at least two operands`, `use ${form}:A,B`, { expr })
+  }
+  const numbers = operands.flatMap((operand) => operandNumbers(operand, ctx, expr))
+  if (numbers.length === 0) {
+    return fail('E_EXPR', `${form} has no operands`, `use ${form}:A,B`, { expr })
+  }
+  switch (form) {
+    case 'sum': return numbers.reduce((total, value) => total + value, 0)
+    case 'mul': return numbers.reduce((total, value) => total * value, 1)
+    case 'sub': return numbers.slice(1).reduce((total, value) => total - value, numbers[0]!)
+    case 'div': {
+      let total = numbers[0]!
+      for (const value of numbers.slice(1)) {
+        if (value === 0) return fail('E_EXPR', 'division by zero', 'supply a non-zero divisor', { expr })
+        total /= value
+      }
+      return total
+    }
+    case 'avg': return numbers.reduce((total, value) => total + value, 0) / numbers.length
+  }
+}
+
+/** `ifpresent` is the only conditional. Its guard must be a scoped reference. */
+function evaluateGuard(body: string, ctx: EvalContext, expr: string): Scalar {
+  const arrow = body.indexOf('->')
+  if (arrow === -1) {
+    return fail('E_EXPR', 'ifpresent is missing ->', 'use ifpresent:@discount -> @discount', { expr })
+  }
+  const guard = body.slice(0, arrow).trim()
+  const then = body.slice(arrow + 2).trim()
+  if (guard.length === 0 || then.length === 0) {
+    return fail('E_EXPR', 'ifpresent needs both a guard and a value', 'use ifpresent:@discount -> @discount', { expr })
+  }
+  const ref = parseRef(guard)
+  if (!ref) return unscoped(guard, expr, 'guard')
+  const value = lookup(ref, ctx, expr)
+  return value === null ? null : evaluate(then, ctx)
 }
 
 /**
- * Evaluate one of the five forms in `design §5`: `P:Name`, `F:Name`,
- * `sum:A,B,C`, `sub:A,B`, `ifpresent:Guard->Then`. An unknown form, a missing
- * name, or a non-numeric arithmetic operand throws `E_EXPR` with an actionable
- * hint; nothing is ever silently blank unless an `ifpresent` guard says so.
+ * Evaluate one form of the closed vocabulary in `design §5`: scoped references
+ * (`@`/`root.`, `.`/`row.`, `totals.`), numeric literals, the five aggregates,
+ * and `ifpresent`. A scope error throws `E_SCOPE_INVALID`; an unknown form or
+ * a malformed expression throws `E_EXPR`. Nothing is ever guessed or blanked.
  */
 export function evaluate(expr: string, ctx: EvalContext): Scalar {
   const text = expr.trim()
   if (text.length === 0) {
-    return fail('E_EXPR', 'empty expression', 'use P:, F:, sum:, sub: or ifpresent:', { expr })
+    return fail('E_EXPR', 'empty expression', `use ${SCOPE_FORMS} or ${SUPPORTED_FORMS}`, { expr })
   }
-  const colon = text.indexOf(':')
-  const form = colon === -1 ? '' : text.slice(0, colon)
-  const body = colon === -1 ? '' : text.slice(colon + 1)
+  if (text.startsWith('(') && text.endsWith(')')) return evaluate(text.slice(1, -1).trim(), ctx)
 
-  switch (form) {
-    case 'P':
-      return requireScalar(body.trim(), ctx, 'P')
-    case 'F':
-      return requireScalar(body.trim(), ctx, 'F')
-    case 'sum': {
-      const operands = splitOperands(body.trim(), 'sum')
-      let total = 0
-      for (const operand of operands) total += numericOperand(operand, ctx)
-      return total
+  const colon = text.indexOf(':')
+  const form = colon === -1 ? '' : text.slice(0, colon).trim()
+  const body = colon === -1 ? '' : text.slice(colon + 1).trim()
+
+  if (form !== '') {
+    if ((AGGREGATES as readonly string[]).includes(form)) {
+      return evaluateAggregate(form as Aggregate, body, ctx, text)
     }
-    case 'sub': {
-      const operands = splitOperands(body.trim(), 'sub')
-      if (operands.length !== 2) {
-        return fail('E_EXPR', `sub needs exactly two operands, got ${operands.length}`, 'use sub:A,B', {
-          expr: text,
-        })
-      }
-      return numericOperand(operands[0]!, ctx) - numericOperand(operands[1]!, ctx)
-    }
-    case 'ifpresent': {
-      const arrow = body.indexOf('->')
-      if (arrow === -1) {
-        return fail('E_EXPR', 'ifpresent is missing ->', 'use ifpresent:Guard->Then', { expr: text })
-      }
-      const guard = body.slice(0, arrow).trim()
-      const then = body.slice(arrow + 2).trim()
-      if (guard.length === 0 || then.length === 0) {
-        return fail('E_EXPR', 'ifpresent needs both a guard and a value', 'use ifpresent:Guard->Then', { expr: text })
-      }
-      return guardPresent(guard, ctx) ? evalThen(then, ctx) : null
-    }
-    default:
-      return fail(
-        'E_EXPR',
-        `unknown expression form "${form.length > 0 ? `${form}:` : text}"`,
-        'supported forms: P:, F:, sum:, sub:, ifpresent:',
-        { expr: text },
-      )
+    if (form === 'ifpresent') return evaluateGuard(body, ctx, text)
+    if (form === 'P' || form === 'F') return unscoped(text, text, 'form')
+    return fail(
+      'E_EXPR',
+      `unknown expression form "${form}:"`,
+      `supported forms: ${SUPPORTED_FORMS}; scopes: ${SCOPE_FORMS}`,
+      { expr: text },
+    )
   }
+
+  const literal = numericLiteral(text)
+  if (literal !== undefined) return literal
+  const ref = parseRef(text)
+  if (ref) return lookup(ref, ctx, text)
+  return unscoped(text, text, 'name')
 }
 
 // ---------------------------------------------------------------------------
@@ -474,24 +644,30 @@ export interface Measurement {
  */
 export type MeasurementOracle = (input: MeasurementInput) => Measurement
 
-/** The local alias set for declared typography tokens; the token itself lives in sure-ui. */
-export const FONT_TOKENS = ['body', 'heading', 'caption', 'mono'] as const
+/** Derived from the sure-ui map: the kept compatibility names, no local list. */
+export const FONT_TOKENS = Object.keys(SURE_DOCUMENT_TYPOGRAPHY) as [
+  SureDocumentTypographyKind,
+  ...SureDocumentTypographyKind[],
+]
 
-/** A declared typography token name. */
-export type FontToken = (typeof FONT_TOKENS)[number]
+/** A declared typography token name (compatibility alias). */
+export type FontToken = SureDocumentTypographyKind
 
 /** True when a font family token is one this renderer may declare. */
 export function isFontToken(token: string): token is FontToken {
-  return (FONT_TOKENS as readonly string[]).includes(token)
+  return Object.prototype.hasOwnProperty.call(SURE_DOCUMENT_TYPOGRAPHY, token)
 }
 
 /**
  * Wrap a host-supplied measurer so an unresolvable font token fails with
  * `E_FONT` at call time rather than silently substituting a host font (A32).
+ * The measurer receives the sure-ui point metrics for the declared token, so
+ * measurement cannot drift from the CSS variable the markup uses (design §9).
  */
 export function createMeasurementOracle(measure: (input: MeasurementInput) => Measurement): MeasurementOracle {
   return (input) => {
-    if (!isFontToken(input.fontFamily)) {
+    const style = isFontToken(input.fontFamily) ? SURE_DOCUMENT_TYPOGRAPHY[input.fontFamily] : undefined
+    if (!style) {
       return fail(
         'E_FONT',
         `font token "${input.fontFamily}" is not resolvable`,
@@ -499,6 +675,6 @@ export function createMeasurementOracle(measure: (input: MeasurementInput) => Me
         { fontFamily: input.fontFamily },
       )
     }
-    return measure(input)
+    return measure({ ...input, fontSize: style.ptSize, lineHeight: style.linePt })
   }
 }
