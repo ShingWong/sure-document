@@ -168,7 +168,7 @@ about their own length:
 | `origin` | `first` (**default**) \| `content` | where counting starts. `content` skips the cover: it is not numbered *and not counted*, so the first content page is **1 of N−1** |
 | `firstPage` | `show` \| `hide` | whether the number is **printed** — hiding does not stop counting |
 | `startAt` | number, default 1 | the first counted page's number, for a document assembled from parts (a binder whose fourth part is page 12) |
-| `scope` + `restart` | `document` \| `section`, `boolean` | numbering runs through the document, or restarts per section (a packet whose notice begins at 1) |
+| `scope` + `restart` | `document` \| `section`, `boolean` | numbering runs through the document, or restarts per section (a packet whose notice begins at 1). `section` needs `document-section` anchors; without them it falls back to `document` with a warning |
 | `style` | `arabic` \| `roman-lower` \| `roman-upper` | `i, ii` for front matter, then `1, 2` for content |
 
 Rules:
@@ -182,7 +182,9 @@ Rules:
 3. **`origin: content` needs a content page.** A document that is all cover
    fails `E_NUMBERING` rather than printing `0 of 0`.
 4. **Restart is a section decision**, and a restarted section starts at 1 unless
-   `startAt` says otherwise; `restart` without sections is a no-op warning.
+   `startAt` says otherwise. `scope: section` or `restart` on a document with no
+   `document-section` anchors is a no-op warning: numbering continues at document
+   scope, it does not fail.
 5. **Style is display only.** It never changes counts, and `total` uses the same
    style, so `i of iv` and `1 of 4` describe the same four pages.
 
@@ -286,7 +288,7 @@ fixed panel and a flow document, and they must survive printing.
 | Entry | Options | Rules |
 |---|---|---|
 | `document-header` | `zones: {left, center, right}`, `rule: boolean`, `repeat: all \| notFirst \| none`, `height` | exactly one per sheet; content is text/slot fillers (below); a guard fails if it exceeds `height` — the header never overlaps the body |
-| `document-footer` | same zones and rules, `repeat` defaults `all` | reserves its own height from the body; may not contain the page number *and* a page-number element (guard) |
+| `document-footer` | same zones and rules, `repeat` defaults `all` | reserves its own height from the body; a footer may carry a right-aligned page number, but it may not bake in a page-number string *and* place a separate `document-page-number` element on the same sheet (guard: one source, the pagination plan) |
 | `document-page-number` | `origin: first \| content`, `firstPage: show \| hide`, `startAt: number`, `scope: document \| section`, `restart: boolean`, `style: arabic \| roman-lower \| roman-upper`, `format: page-of-total \| n \| n/total`, `total: boolean`, `prefix`, `suffix`, `align` | two separate questions — **where counting starts** (`origin`) and **whether it is shown** (`firstPage`) — see the rules below. `total` requires the **pagination pass** (design §9) |
 | `document-date` | `kind: issued \| captured`, `format`, `label`, `timezone` | **never the clock.** `issued` comes from the data; `captured` is an input supplied by the capture step. `timezone` defaults to UTC so the same document prints the same date anywhere (A2, A8) |
 | `document-logo` | `svg` (inline, no URL), `maxHeight`, `monochrome`, `alt`, `fallback: wordmark` | vector only; intrinsic aspect preserved; `monochrome` renders in `currentColor` for print; a missing asset falls back to the wordmark, never a broken box |
@@ -397,13 +399,14 @@ adding a TOC later means reworking the pass.
 
 ## 6. When to add an entry
 
-Two products need it, or three reports repeat it. On that rule the first five
-are justified already by the first consumer's paper and the statement that follows:
+Two products need it, or three reports repeat it. The furniture entries —
 `document-sheet` · `document-header` · `document-footer` · `document-page-number`
-· `document-date` · `document-logo` · `document-watermark` (the furniture every
-multi-page document needs), then `document-table` · `document-totals`
-· `document-keyvalue` · `document-schedule`, then `figure-bar` for the first
-flow document.
+· `document-date` · `document-logo` · `document-watermark` — are the foundational
+sheet runtime: every multi-page document needs them, whatever the product.
+**Phase 3 ships the first five body entries** to `sure-store/components/`:
+`document-table` · `document-totals` · `document-keyvalue` · `document-schedule`
+· `document-graphic` (`plan.md` Phase 3). `figure-bar` follows with the first flow
+document. Anything beyond that needs the two-product/three-report rule again.
 
 ## 7. Upstream work, in order
 
