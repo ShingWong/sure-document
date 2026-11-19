@@ -13,12 +13,13 @@ Envelope (in `--agent` mode):
 
 | Code | Exit | Raised when | Fix |
 |---|---|---|---|
-| `E_LAYOUT` | 2 | a layout is malformed: band without height, element without geometry, page without size, or a panel/section nested inside another sheet (sheets are siblings, `design §9.3`) | fix the layout data; it is data, so the failure names the path |
+| `E_LAYOUT` | 2 | a layout is malformed: band without height, element without geometry, page without size, a panel/section nested inside another sheet (sheets are siblings, `design §9.3`), or a single table row taller than the printable body height (`design §9.3`, A33) | fix the layout data, or split the row's content across rows; it is data, so the failure names the path |
 | `E_ELEMENT` | 2 | an element kind this version does not render | upgrade, or use a supported kind (`docs/design.md §4`) |
 | `E_EXPR` | 2 | an expression form outside the vocabulary, or a parameter/field that is not supplied | the vocabulary is closed (`design.md §5`); the hint names the nearest supplied name |
 | `E_DATA` | 2 | the data does not match the layout's declared shape (`rows` given to a `record` element, a projection missing a column) | fix the projection at the caller, not the layout |
 | `E_FORMAT` | 2 | a declared format cannot render its value (e.g. `date` on a non-date) | fix the data; a format never guesses |
-| `E_GUARD` | 3 | a `guard` failed: the document printed figures that do not reconcile | **do not print**. Recompute server-side and re-render — this is the failure that replaces PDF eyeballing |
+| `E_FONT` | 2 | a declared typography token or font family cannot be resolved by the measurement oracle (A32) | declare a supported sure-ui type token, or supply metrics for the family; never fall back to a host font silently |
+| `E_GUARD` | 3 | a `guard` failed: the document printed figures that do not reconcile, or a meaningful watermark (`EXAMPLE ONLY`, `VOID`, `CONFIDENTIAL`) has no textual counterpart in the document's text or metadata (`catalog.md §3` rule 4) | **do not print**. For totals, recompute server-side and re-render; for a watermark, put the same words in the document text or metadata — this is the failure that replaces PDF eyeballing |
 | `E_FIXTURE` | 3 | a fixture's expectations do not match the output | the document changed: update the fixture in the same commit, and say so |
 | `E_PAGE` | 2 | an element falls outside the sheet (fixed mode) | fix the design; overflow is a layout bug, not a printer's problem |
 | `E_PAPER` | 2 | an unknown paper name, a custom size outside 72–14400 pt, a unit mistake (612×792 in `mm`, 8.5×11 in `pt`), paper or orientation that does not match the design (fixed mode), or a document mixing orientations without declaring them per section | correct the sheet, not the design. `error.hint` lists the valid names, or names the likely unit; `sure-document paper list --agent` has the table |
