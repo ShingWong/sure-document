@@ -155,6 +155,21 @@ The owner is working on that product in parallel. Interface changes to sure-ui
 and sure-factor affect it: land and publish upstream first, then tell the owner
 which version to adopt.
 
+## Upstream releases
+
+| Package | Version | State | Carries |
+|---|---|---|---|
+| `@shing.wong/sure-ui` | 0.3.6 | **published** | the `document` and `figure` blocks (classes, print rules, tokens only) |
+| `@shing.wong/sure-factor` | 0.6.0 | **staged, awaiting owner's 2FA approval** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards |
+| `@shing.wong/sure-store/components` | — | not started | the first five catalog entries |
+| `@shing.wong/sure-document` | 0.0.0 | private, unpublished | Phase 0.5 harness only; renderer pending |
+
+Two follow-ups before adopting sure-factor 0.6.0 downstream: its lockfile still
+pins sure-ui 0.3.5, and the report-entry block check is deliberately deferred
+(`TODO(sure-ui-blocks)`) so the registry test does not demand an unpublished
+block. Once approved, bump the sure-ui dependency to ^0.3.6 and enable that
+check in a follow-up release.
+
 ## When you finish a phase
 
 Tick it in `docs/plan.md`, add the `CHANGELOG.md` line, update the docs surface
