@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Phase 4 — fixed-mode renderer
+
+- Added `renderDocument`/`renderPanel`: layout + rows → flat `sheets[]` HTML,
+  renderer-owned `@page` geometry, sheet-level furniture, escaped text and
+  sure-ui 0.3.7 class names only.
+- Bound typography to `SURE_TYPOGRAPHY` from sure-ui 0.3.7 via a checked-in
+  generated map with a `check:typography` drift gate; zero runtime dependencies.
+- Rewrote `evaluate` to the strict `@`/`.` grammar with five aggregates,
+  `ifpresent` and `E_SCOPE_INVALID`; removed the hard-coded `FONT_TOKENS` list.
+- `npm run verify` is green, including `check:exports` (3 subpaths).
+
 ### Upstream releases (Phases 1–2)
 
 - `@shing.wong/sure-ui` 0.3.6 published: the `document` and `figure` blocks,

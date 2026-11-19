@@ -116,6 +116,12 @@ sure-ui classes and the catalog contract; what must be identical is the paper.)
 no runtime dependency; the sheet set is flat (A30) and the screen preview is the
 printed artefact (A31).
 
+**Status (2026-11-19):** fixed-mode renderer shipped — `renderDocument`,
+`renderPanel`, flat `sheets[]`, renderer-owned `@page`, sure-ui 0.3.7 classes and
+`SURE_TYPOGRAPHY`-derived CSS variable, closed `@`/`.` expressions. Full
+`npm run verify` green (96 tests). Flow mode, TOC and browser-backed acceptance
+rows remain for Phase 5.
+
 ## Phase 5 — flow mode, proven by the statement
 
 Bands, sections, repeating rows, keep-together, page numbers, subtotals. The
