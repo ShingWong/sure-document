@@ -54,8 +54,48 @@ The bundled benchmark measures the **built package** with 20 warmup and 200
 timed renders per case:
 
 ```bash
-npm run bench
+npm install
+npm test          # Vitest: layout, format, renderer, generator and gate tests
+npm run verify    # lint + build + test + all doc/exports/errors/typography gates
+npm run bench     # build, then benchmark three synthetic workloads
 ```
+
+### The performance test
+
+The executable source is [`scripts/bench.mjs`](scripts/bench.mjs). It imports the
+**built** package, warms up, times each render, and fails if a result lacks
+`@page` rules or reports an inconsistent sheet count. The measurement loop is:
+
+```js
+import { performance } from 'node:perf_hooks'
+import { renderDocument } from '../dist/index.js'
+
+const WARMUP = 20
+const ITERATIONS = 200
+
+function measure(input) {
+  for (let i = 0; i < WARMUP; i++) renderDocument(input)
+
+  const times = []
+  for (let i = 0; i < ITERATIONS; i++) {
+    const start = performance.now()
+    const result = renderDocument(input)
+    times.push(performance.now() - start)
+    if (!result.html.includes('@page')) throw new Error('no @page rules emitted')
+    if (result.sheets.length !== result.sheetCount) throw new Error('sheet count disagrees')
+  }
+
+  const sorted = times.sort((a, b) => a - b)
+  return {
+    medianMs: sorted[Math.floor(sorted.length / 2)],
+    p95Ms: sorted[Math.floor(sorted.length * 0.95)],
+  }
+}
+```
+
+The `cases` array in the same file defines the three synthetic workloads below.
+Acceptance assertions (A8, A16, A19, A30, A31, A33, …) live in
+[`tests/render.test.ts`](tests/render.test.ts).
 
 Measured on this machine (Linux x64, Intel Xeon E5-2698 v4 @ 2.20 GHz, Node
 v22.23.4):
