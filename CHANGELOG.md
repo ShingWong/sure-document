@@ -10,6 +10,7 @@
 
 ### Documentation
 
+- Removed an absolute local workspace path from AGENTS.md before public release.
 - `docs/design.md` is now an append-only Architectural Decision Record. All
   decisions through Phase 4 are accepted and frozen (§1–§13 and §14.2); a change
   must append a dated superseding section, never edit one. AGENTS.md enforces it.

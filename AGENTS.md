@@ -232,6 +232,5 @@ agent and every subagent.
 
 ## Graphify
 
-Index this repository with `/graphify .` once code lands; `graphify-out/` is
-git-ignored. Query the cross-repo graph before grepping
-(`/usr/local/devel/sure-master/graphify-out/merged-graph.json`).
+Index this repository with `/graphify .`; `graphify-out/` is git-ignored. Query
+the merged cross-repo graph in the shared workspace before grepping.
