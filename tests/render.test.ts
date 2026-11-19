@@ -39,9 +39,9 @@ describe('renderDocument — fixed mode', () => {
   it('resolves expressions and declared formats, escaping every text value', () => {
     const result = renderDocument({
       layout: fixedLayout([
-        text('party', 36, 36, { expr: 'P:party' }),
-        text('amount', 36, 56, { expr: 'P:amount', format: 'currency' }),
-        text('issued', 36, 76, { expr: 'P:issuedOn', format: 'date' }),
+        text('party', 36, 36, { expr: '@party' }),
+        text('amount', 36, 56, { expr: '@amount', format: 'currency' }),
+        text('issued', 36, 76, { expr: '@issuedOn', format: 'date' }),
       ]),
       data: {
         ...synthetic,
@@ -56,7 +56,7 @@ describe('renderDocument — fixed mode', () => {
   })
 
   it('is byte-identical on a reprint (A8) and never touches clock, Intl or fetch (A9, A17)', () => {
-    const layout = fixedLayout([text('issued', 36, 36, { expr: 'P:issuedOn', format: 'date' })])
+    const layout = fixedLayout([text('issued', 36, 36, { expr: '@issuedOn', format: 'date' })])
     const data = { ...synthetic, params: { issuedOn: '2031-04-15' }, capturedAt: '2031-04-15T00:00:00Z' }
     const first = renderDocument({ layout, data })
 
@@ -238,7 +238,8 @@ describe('renderDocument — fixed mode', () => {
 
   it('reports geometry outside the sheet and bad expressions with stable codes', () => {
     expectCode(() => renderDocument({ layout: fixedLayout([text('wide', 600, 36, { w: 20, text: 'X' })]) }), 'E_PAGE')
-    expectCode(() => renderDocument({ layout: fixedLayout([text('missing', 36, 36, { expr: 'P:absent' })]) }), 'E_EXPR')
+    expectCode(() => renderDocument({ layout: fixedLayout([text('missing', 36, 36, { expr: '@absent' })]) }), 'E_SCOPE_INVALID')
+    expectCode(() => renderDocument({ layout: fixedLayout([text('bad', 36, 36, { expr: 'upper:absent' })]) }), 'E_EXPR')
   })
 
   it('builds accessible figures from a scale with a data fallback', () => {
@@ -267,7 +268,7 @@ describe('renderDocument — fixed mode', () => {
       { kind: 'header', zones: { left: 'L', center: 'C', right: 'R' }, rule: false },
       { kind: 'footer', zones: { left: 'L' } },
       { kind: 'pageNumber' },
-      { kind: 'date', expr: 'P:issuedOn' },
+      { kind: 'date', expr: '@issuedOn' },
       { kind: 'watermark', text: 'Example Only' },
       { kind: 'line', x: 36, y: 60, w: 100, h: 1, direction: 'horizontal' },
       { kind: 'rect', x: 36, y: 70, w: 100, h: 20 },
@@ -327,7 +328,7 @@ describe('renderDocument — fixed mode', () => {
       layout: fixedLayout([
         { kind: 'header', zones: { left: '@name', center: 'row.amount', right: 'root.total' } },
         text('literal', 36, 36, { text: '.field' }),
-        text('expr', 36, 56, { expr: 'P:party' }),
+        text('expr', 36, 56, { expr: '@party' }),
         { kind: 'table', x: 36, y: 76, w: 300, h: 40, columns: ['Value'], rows: [{ Value: '@name' }] },
       ]),
       data: { ...synthetic, params: { party: 'Test Person A' } },

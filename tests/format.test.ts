@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -118,7 +118,7 @@ describe('evaluate — the closed vocabulary (design §5, A3)', () => {
   })
 
   it('throws E_SCOPE_INVALID for removed P: and F: forms', () => {
-    for (const expr of ['P:rate', 'F:amount', 'sum:P:a,F:b', 'ifpresent:P:flag->@rate', '@rate -> F:amount']) {
+    for (const expr of ['P:rate', 'F:amount', 'sum:P:a,F:b', 'ifpresent:P:flag->@rate', 'ifpresent:F:flag->@rate']) {
       const error = expectCode(() => evaluate(expr, context), 'E_SCOPE_INVALID')
       expect(error.hint).toMatch(/use @name for parameters or \.name for row fields/)
     }
@@ -132,9 +132,10 @@ describe('evaluate — the closed vocabulary (design §5, A3)', () => {
   })
 
   it('throws E_SCOPE_INVALID for a .field with no active row', () => {
-    for (const expr of ['.amount', 'row.amount', 'avg: rows.amount']) {
+    for (const expr of ['.amount', 'row.amount']) {
       expectCode(() => evaluate(expr, { params: { rows } }), 'E_SCOPE_INVALID')
     }
+    expectCode(() => evaluate('sum: rows.amount', { params: { rate: 1 } }), 'E_SCOPE_INVALID')
     const noRows = expectCode(() => evaluate('.amount', { params: { rate: 1 } }), 'E_SCOPE_INVALID')
     expect(noRows.hint).toMatch(/supply a row/)
   })
@@ -152,7 +153,7 @@ describe('evaluate — the closed vocabulary (design §5, A3)', () => {
     expectCode(() => evaluate('.absent', context), 'E_SCOPE_INVALID')
     expectCode(() => evaluate('row.absent', context), 'E_SCOPE_INVALID')
     expectCode(() => evaluate('sum: rows.absent', context), 'E_SCOPE_INVALID')
-    expectCode(() => evaluate('@rate', { ...context, params: { rows: 'not-rows' } }), 'E_SCOPE_INVALID')
+    expectCode(() => evaluate('sum: rows.amount', { params: { rows: 'not-rows' } }), 'E_SCOPE_INVALID')
     expectCode(() => evaluate('ifpresent: bare -> @rate', context), 'E_SCOPE_INVALID')
   })
 
@@ -339,6 +340,7 @@ describe('typography — sure-ui is the sole source of truth (design §9, A32)',
   it('detects a stale generated module and leaves a regenerated copy to diff', () => {
     const root = mkdtempSync(join(tmpdir(), 'sure-document-typography-test-'))
     tempRoots.push(root)
+    mkdirSync(join(root, 'src'), { recursive: true })
     const write = (file: string, text: string) => writeFileSync(join(root, file), text, 'utf8')
     write('src/typography.generated.ts', 'export const SURE_DOCUMENT_TYPOGRAPHY = {}\n')
     const problems = checkTypography(root).join('\n')
