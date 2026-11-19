@@ -28,18 +28,18 @@ The six contract documents exist; the *system* that keeps them true does not.
 This phase wires it before code arrives, because docs gates retrofitted onto a
 finished project never get switched on.
 
-- [ ] `docs/index.md` as the single entry point, with a reading order per
-      audience (done — this file's sibling)
-- [ ] `docs/glossary.md` and `docs/errors.md` (done)
-- [ ] `examples/` with one runnable fixture per layout mode; every example is a
-      test
-- [ ] `fixtures/generate.ts` — seeded, deterministic, synthetic only
+- [x] `docs/index.md` as the single entry point, with a reading order per
+      audience (this file's sibling)
+- [x] `docs/glossary.md` and `docs/errors.md`
+- [x] `examples/` with one runnable fixture per layout mode; every example is
+      replayed by `check:examples`
+- [x] `fixtures/generate.ts` — seeded, deterministic, synthetic only
       (`docs/acceptance.md §2`)
 - [ ] the acceptance suite as code (A1–A33), starting with the non-browser
-      criteria (A2, A3, A8, A9, A11, A32, A33)
-- [ ] CI gates: link + anchor check, example replay, generated-reference
-      freshness, error-code coverage (`src` ↔ `errors.md`)
-- [ ] Definition of done written into AGENTS.md: behavior change ⇒ test +
+      criteria (A2, A3, A8, A9, A11, A32, A33) — needs the renderer
+- [ ] CI gates: link + anchor check, example replay and error-code coverage are
+      live; **generated-reference freshness is still outstanding**
+- [x] Definition of done written into AGENTS.md: behavior change ⇒ test +
       doc row + changelog entry in the same commit
 
 **Acceptance:** CI fails when a documented example stops running, when an error
@@ -71,6 +71,10 @@ document decision while leaving `zoom` to the viewer (`§3.2`).
 regenerated; the registry test in sure-factor passes against the published
 version (release order: sure-ui first).
 
+**Status (2026-11-19):** shipped in `@shing.wong/sure-ui` 0.3.6. Every theme
+styles both blocks and the 0.1.9 fixture change is additive-only. A sure-factor
+follow-up is enabling the registry check against that published version.
+
 ## Phase 2 — sure-factor: catalog schema 0.6
 
 Add `family`, `data`, `print`, `guards`, `fixture` to `CatalogComponent`, and
@@ -80,6 +84,10 @@ without weakening the class-coverage guard for templates.
 **Acceptance:** an entry with the four keys parses, generates a `report` module,
 and fails loudly when a `guard` expression references a projection that does not
 exist.
+
+**Status (2026-11-19):** shipped in `@shing.wong/sure-factor` 0.6.0; the
+bidirectional error-code gate here covers all 19 codes. The template
+class-coverage guard is unchanged.
 
 ## Phase 3 — the first five entries (sure-store/components)
 
