@@ -1,0 +1,31 @@
+name: Security
+
+# Leak gate on every push and PR. The same scanner runs in the local
+# pre-commit hook, so a leak is caught at commit time and again in CI.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: keys, credentials, PII, product-data hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          # Plain node, no npm ci: the scanner is dependency-free by design.
+          node-version: 20
+
+      - name: Security and leak scan
+        run: node scripts/security-check.mjs

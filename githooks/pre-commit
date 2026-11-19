@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Repository security gate — runs before every commit.
+# Install once per clone with: git config core.hooksPath githooks
+set -e
+exec node scripts/security-check.mjs
