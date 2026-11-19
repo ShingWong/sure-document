@@ -160,14 +160,25 @@ which version to adopt.
 | Package | Version | State | Carries |
 |---|---|---|---|
 | `@shing.wong/sure-ui` | 0.3.6 | **published** | the `document` and `figure` blocks (classes, print rules, tokens only) |
-| `@shing.wong/sure-factor` | 0.6.0 → 0.6.1 | **0.6.0 published; 0.6.1 staging** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards; 0.6.1 adds ^0.3.6 dependency and live block validation |
-| `@shing.wong/sure-store/components` | — | not started | the first five catalog entries |
+| `@shing.wong/sure-factor` | 0.6.1 | **published** | `family`/`data`/`print`/`guards`/`fixture`, report contract, projection-safe guards, ^0.3.6 dependency and live block validation |
+| `@shing.wong/sure-store` | 0.4.1 | **blocked on npm trusted-publisher setup** (GitHub repo public, CI green, tarball built) | the first five document entries with synthetic fixture goldens and a replay suite |
 | `@shing.wong/sure-document` | 0.0.0 | private, unpublished | Phase 0.5 harness only; renderer pending |
 
-Both follow-ups are addressed in sure-factor 0.6.1 (merged and staging at the
-time of writing): the sure-ui dependency is ^0.3.6 and the report-entry block
-check is live against the installed `COMPONENTS`. Adopt 0.6.1, not 0.6.0, for
-downstream work.
+Both follow-ups are addressed in sure-factor 0.6.1, which is published: the
+sure-ui dependency is ^0.3.6 and the report-entry block check is live against
+the installed `COMPONENTS`. Adopt 0.6.1, not 0.6.0, for downstream work.
+
+`sure-store` was made public when its contract stabilized; `main` is now
+PR-protected. Its security gate checks commit identities in history, so new
+commits use the maintainer's `@positronic-ai.us` org address. Older commits on the
+same domain with a different local part predate this work; the domain passes the
+gate, and a full public-history rewrite has not been performed.
+
+0.4.1's Publish run failed with **E401**: npm has no trusted publisher configured
+for `@shing.wong/sure-store` (unlike sure-ui and sure-factor). The owner must add
+one on npmjs: owner `ShingWong`, repo `sure-store`, workflow `publish.yml`, no
+environment. Then rerun publish action run `44508755316`; it stages 0.4.1 for
+2FA approval.
 
 ## When you finish a phase
 
