@@ -153,7 +153,7 @@ Two numbers people confuse, and the confusion costs a legal form its geometry:
 | allowed in flow mode | `fit: none \| width \| page`, computed once, deterministically | irrelevant |
 
 A printer driver may still shrink the page; that is outside the document, so the
-defence is a calibration sheet from `sure document print-check`, printed on the
+defence is a calibration sheet from `sure-document print-check`, printed on the
 real device — a 4 in / 100 mm rule that either measures true or reveals the
 driver is at 96%.
 

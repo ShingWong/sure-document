@@ -236,14 +236,14 @@ follows the document then paints through it.
 
 Two things the renderer cannot control, and therefore does not pretend to:
 a printer driver's "fit to page", and a photocopier's zoom. The defence is a
-**print-check** command (`sure document print-check`), which emits a sheet with a
+**print-check** command (`sure-document print-check`), which emits a sheet with a
 calibrated 4 in / 100 mm rule so someone can verify 1:1 on the actual device.
 That is a diagnostic, never part of a document.
 
 #### Paper sizes
 
 Ten named sizes cover what a finance office prints; anything else is `custom`.
-The table is data, not prose — the renderer ships it, `sure document paper list
+The table is data, not prose — the renderer ships it, `sure-document paper list
 --agent` returns it, and an agent should read it rather than hard-code numbers.
 
 | Name | Also known as | in | mm | **pt** (canonical) |
@@ -273,7 +273,7 @@ Rules:
    `E_PAPER` with a hint naming the likely unit. The bounds are 72 pt (1 in) to
    14400 pt (200 in) on either side.
 5. **An unknown name lists the valid ones** in `error.hint`, and the same list is
-   available from `sure document paper list --agent` — an agent should never have
+   available from `sure-document paper list --agent` — an agent should never have
    to guess a spelling.
 6. **Default is `letter`**, because the office is in the US; a product may set
    its own default, and a fixed design's size always wins over it.

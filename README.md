@@ -78,7 +78,7 @@ everywhere it can be typed:
 | package | `@shing.wong/sure-document` |
 | sure-ui block | `document` (`sure-document__sheet`, …) |
 | catalog entries | `document-table`, `document-totals`, `document-sheet`, … |
-| CLI verb | `sure document render …` |
+| CLI verb | `sure-document render …` |
 | TypeScript | `renderDocument`, `DocumentLayout` |
 
 A few more bytes cost nothing; three spellings of one concept cost an agent a

@@ -29,7 +29,7 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 ## Closed decisions — do not reopen without the owner
 
 1. **Package name** `sure-document`; one spelling of the word everywhere:
-   block `document`, entries `document-*`, verb `sure document …`, code
+   block `document`, entries `document-*`, verb `sure-document …`, code
    `renderDocument`.
 2. **Two new sure-ui blocks only**: `document` and `figure`. Tables, totals and
    prose reuse `table` and `markdown`.

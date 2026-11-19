@@ -17,12 +17,12 @@ the page is the bug.
 | 3 | [catalog.md](catalog.md) §2–§3 | the parts that exist and the data shape each eats |
 | 4 | [acceptance.md](acceptance.md) | the fixture data policy and the A1–A13 acceptance suite |
 | 5 | [../examples/](../examples/) | runnable fixtures — copy one, change the data |
-| 6 | `sure document schema --agent` | the machine contract: arguments, outputs, error codes |
+| 6 | `sure-document schema --agent` | the machine contract: arguments, outputs, error codes |
 | 7 | [errors.md](errors.md) | every failure the renderer can raise, and what to do |
 | 8 | [glossary.md](glossary.md) | the words, so you do not invent a synonym |
 
 If you only have one file: `AGENTS.md`. If you only have one command:
-`sure document schema --agent`.
+`sure-document schema --agent`.
 
 ## Reading order — a human
 
@@ -88,7 +88,7 @@ incomplete, the same way a change without a test is.
 |---|---|---|
 | API reference | TSDoc in `src/` | CI regenerates and diffs; a stale file fails |
 | catalog reference | `sure-store/components/*.yaml` | schema validation + fixture replay |
-| CLI schema | command definitions | `sure document schema --agent` compared to the committed file |
+| CLI schema | command definitions | `sure-document schema --agent` compared to the committed file |
 | error catalogue | the codes' tests | every code in `src/` must appear in `errors.md` |
 | examples | `examples/` fixtures | every example runs in `npm test` |
 

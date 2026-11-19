@@ -7,7 +7,8 @@ not a product.
 ## Project overview
 
 Documents for the sure stack: a layout in TS/JSON, rendered from rows the
-application already holds, to HTML that prints, and optionally to PDF.
+application already holds, to print-ready HTML (compiled to PDF by the host at the
+product edge).
 
 The stack is **agent-first**: the primary consumer of this package is a coding
 agent, then the program it writes. That has consequences a human-first library
@@ -57,11 +58,11 @@ Every command of this package's CLI is expected to support `--agent`
 - destructive operations require `--yes`; without it the answer is `ECONFIRM`.
 
 A document command must be verifiable the same way. This example is the
-**umbrella `sure` CLI** — it resolves `--entity`/`--id` through sure-state and
+**`sure-document` CLI** — it resolves `--entity`/`--id` through sure-state and
 hands plain rows to this package; the renderer itself never fetches them:
 
 ```
-sure document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent
+sure-document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent
 ```
 
 At the package boundary the call is pure and takes local inputs:
@@ -75,10 +76,10 @@ renderDocument({ layout, data })   // layout + data → HTML string
 ## Agent tools and MCP
 
 This package ships **no MCP server and no tool definitions**. `sure-state` owns
-`createAgentTools`/`createMcpServer`, and the umbrella `sure` CLI exposes the
-`document` commands (including `sure mcp serve`). A renderer is a function, not a
-service: exposing it as a tool is the host's job, so the same function cannot
-behave differently depending on who called it.
+`createAgentTools`/`createMcpServer`; the `sure-document` CLI exposes the document
+commands, and MCP serving stays a host concern (the umbrella `sure mcp serve`).
+A renderer is a function, not a service: exposing it as a tool is the host's job,
+so the same function cannot behave differently depending on who called it.
 
 ## Documentation duties
 
@@ -101,7 +102,7 @@ Rules that keep both audiences served:
   reference from TSDoc; examples are fixtures the suite runs. Never hand-copy a
   signature or an output into prose.
 - **Agent-first prose.** Stable headings, one concept per file, a glossary that
-  settles synonyms, and a machine contract (`sure document schema --agent`)
+  settles synonyms, and a machine contract (`sure-document schema --agent`)
   for anything with arguments.
 - **No orphan pages.** Every document is linked from `docs/index.md`, which
   carries the reading order for each audience.

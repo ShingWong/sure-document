@@ -138,13 +138,13 @@ documented).
 
 ## Phase 7 — the agent surface
 
-`sure document render|validate|paper|vars|state|events` with `--agent` per the
+`sure-document render|validate|paper|vars|state|events` with `--agent` per the
 stack convention — `paper list` returns the ten named sizes in pt/mm/in so an
 agent never hard-codes a page; structured errors emitted as events; the event journal that makes
 `events` true (sure-state).
 
 **Acceptance:** an agent runs
-`sure document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent`
+`sure-document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent`
 and gets an envelope containing the file path, the page count and the guard
 results — with no human in the loop and no PDF eyeballing.
 
@@ -159,7 +159,7 @@ the edge), a migrating-from-Jasper guide, a cookbook built from `examples/`,
 an API reference generated from TSDoc, a CHANGELOG with migration notes.
 
 **Agent:** the `sure-document` skill in `.opencode/skills/` (when to use it,
-the composition recipe, the five mistakes), `sure document schema --agent`
+the composition recipe, the five mistakes), `sure-document schema --agent`
 committed as `docs/schema.json`, the catalog reference generated from the YAML
 (data shape, guards, fixture per entry), and the error catalogue regenerated
 from the codes' tests.
@@ -170,7 +170,7 @@ naming.
 - [ ] every doc page linked from `docs/index.md`, no orphans
 - [ ] every example executed by `npm test`
 - [ ] API reference regenerated in CI and diffed
-- [ ] `docs/schema.json` matches `sure document schema --agent`
+- [ ] `docs/schema.json` matches `sure-document schema --agent`
 - [ ] every code in `src/` present in `docs/errors.md`, and vice versa
 - [ ] a human who has never seen the project renders the statement in < 15
       minutes using only the quickstart
