@@ -11,15 +11,14 @@ the page is the bug.
 
 | # | Read | Why |
 |---|---|---|
-| 0 | [HANDOFF.md](../HANDOFF.md) | status, the first three tasks, guardrails — transient |
-| 1 | [AGENTS.md](../AGENTS.md) | what belongs here, what is refused, the gates |
-| 2 | [design.md](design.md) §1–§5 | the model: layout + data → HTML; fixed vs flow; the expression vocabulary |
-| 3 | [catalog.md](catalog.md) §2–§3 | the parts that exist and the data shape each eats |
-| 4 | [acceptance.md](acceptance.md) | the fixture data policy and the A1–A33 acceptance suite |
-| 5 | [../examples/](../examples/) | runnable fixtures — copy one, change the data |
-| 6 | `sure-document schema --agent` | the machine contract: arguments, outputs, error codes |
-| 7 | [errors.md](errors.md) | every failure the renderer can raise, and what to do |
-| 8 | [glossary.md](glossary.md) | the words, so you do not invent a synonym |
+| 0 | [AGENTS.md](../AGENTS.md) | what belongs here, what is refused, the gates, release mechanics |
+| 1 | [design.md](design.md) §1–§5 | the model: layout + data → HTML; fixed vs flow; the expression vocabulary |
+| 2 | [catalog.md](catalog.md) §2–§3 | the parts that exist and the data shape each eats |
+| 3 | [acceptance.md](acceptance.md) | the fixture data policy and the A1–A33 acceptance suite |
+| 4 | [../examples/](../examples/) | runnable fixtures — copy one, change the data |
+| 5 | `sure-document schema --agent` | the machine contract: arguments, outputs, error codes |
+| 6 | [errors.md](errors.md) | every failure the renderer can raise, and what to do |
+| 7 | [glossary.md](glossary.md) | the words, so you do not invent a synonym |
 
 If you only have one file: `AGENTS.md`. If you only have one command:
 `sure-document schema --agent`.
@@ -56,7 +55,6 @@ layout  +  data  →  render  →  HTML  →  print | PDF (host compiled)
 
 | Path | Holds |
 |---|---|
-| `HANDOFF.md` | transient state: status, first tasks, open decisions |
 | `README.md` | the pitch, the boundaries, the name |
 | `AGENTS.md` | the agent's contract and the gates |
 | `docs/index.md` | this file: reading orders and update duties |

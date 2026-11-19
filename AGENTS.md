@@ -146,12 +146,21 @@ consumer's CI holds it. When the scanner flags something, fix the value — do
 not loosen a pattern. A deliberate placeholder goes in the `ALLOW` list in the
 script, keyed by file + label + exact match, with a reason.
 
-The repository is **private until the first stable release**, then goes public
-under the same MIT license. At that point also enable branch protection on
-`master` and add the publish workflow (staged npm release, human 2FA approval).
-Protection cannot be set while the repo is private: the account is on GitHub's
-free `User` plan, which returns 403 for branch protection and rulesets on private
-repos. Do not retry it before the release — see `HANDOFF.md`.
+## Release mechanics
+
+1. Upstream first: sure-ui → sure-factor → sure-store entries → this package.
+   The registry test validates against the *installed* sure-ui, so never declare
+   a block before it has shipped.
+2. PR → CI green (`lint, build, test`) → squash merge to `master`.
+3. Merging stages the npm release. A human with 2FA must approve it **the same
+   day**: staged publishes expire after seven days and simply vanish.
+4. The repository is private until the first stable release, then goes public
+   under the same MIT license; enable branch protection on `master` then. It
+   cannot be set while private on this account's free `User` plan (403), so
+   PR-only merging is a convention until then.
+5. Never weaken a test to make a phase pass. If an acceptance row is wrong, say
+   so and change the row with a reason. The product's paper, wording and
+   geometry stay in the product's repository; never copy them here.
 
 ## Build & test
 

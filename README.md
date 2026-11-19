@@ -157,7 +157,6 @@ Start at **[docs/index.md](docs/index.md)** for the reading order.
 
 | Doc | Audience |
 |---|---|
-| [HANDOFF.md](HANDOFF.md) | the next agent: status, first tasks, guardrails |
 | [AGENTS.md](AGENTS.md) | an agent working in this repo: boundaries, refusals, gates, doc duties |
 | [docs/design.md](docs/design.md) | the architecture, as numbered dated decisions |
 | [docs/catalog.md](docs/catalog.md) | the report component catalog and the two sure-ui blocks |

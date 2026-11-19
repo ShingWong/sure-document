@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Documentation
+
+- Removed the transient `HANDOFF.md`. Its still-live rules — upstream release
+  order, PR/CI/squash flow, 2FA approval of staged publishes, the seven-day
+  expiry, and the refusal to weaken tests — now live in
+  `AGENTS.md §Release mechanics`. Reading orders and doc maps no longer link to it.
+
 ### Phase 4 — fixed-mode renderer
 
 - Added `renderDocument`/`renderPanel`: layout + rows → flat `sheets[]` HTML,
