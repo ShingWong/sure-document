@@ -348,3 +348,18 @@ describe('renderDocument — fixed mode', () => {
     expect(renderPanel(input)).toEqual(renderDocument(input))
   })
 })
+
+describe('printed line metrics', () => {
+  // A fixed form sizes its boxes for the printed line, not the web's leading:
+  // with the browser's default line-height a four-line heading overflows a 45pt
+  // box and paints over the field below it.
+  it('sets the printed leading and clips an overlong value', () => {
+    const html = renderDocument({
+      layout: fixedLayout([text('heading', 36, 36, { text: 'NEGOTIABLE PAPER', size: 11, h: 45 })]),
+      data: {},
+    }).html
+    expect(html).toContain('line-height:1.1')
+    expect(html).toContain('overflow:hidden')
+    expect(html).toContain('white-space:pre-wrap')
+  })
+})

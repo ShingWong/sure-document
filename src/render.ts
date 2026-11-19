@@ -234,7 +234,11 @@ function elementText(element: Element, ctx: RenderCtx): string {
 }
 
 function textStyle(element: TextElement): string {
-  let style = ''
+  // A fixed form sizes its boxes for the printed line, not for the web's
+  // leading: 1.1 is what the legacy designs assume (the value the portal's old port used), and without it a three-line
+  // heading overflows a 45pt box and overlaps the field below it. `overflow`
+  // clips the way the printed form clips rather than spilling into a neighbour.
+  let style = 'line-height:1.1;white-space:pre-wrap;overflow:hidden;'
   if (element.align) style += `text-align:${element.align};`
   if (isFiniteNumber(element.size)) style += `font-size:${pt(element.size)};`
   if (element.bold) style += 'font-weight:bold;'
