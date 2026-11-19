@@ -165,10 +165,10 @@ do.
 npm install @shing.wong/sure-document
 ```
 
-This package is pre-1.0 and private until its first stable release; the command
-above is the install path once it is published. Include sure-ui's compiled CSS in
-the host (for example via `compose()` from `@shing.wong/sure-ui@0.3.7`) so the
-emitted `.sure-document__*` classes are painted.
+The first stable release is `0.1.0`. Include sure-ui's compiled CSS in the host
+(for example via `compose()` from `@shing.wong/sure-ui@0.3.7`) so the emitted
+`.sure-document__*` classes are painted. Flow mode and the table of contents are
+still on the roadmap; see [docs/plan.md](docs/plan.md).
 
 ---
 

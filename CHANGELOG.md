@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.0] - 2026-11-19
+
+First stable release. Fixed-mode renderer, closed expression grammar,
+sure-ui-bound typography, seeded fixture generator and all documentation gates.
+Published under MIT; the GitHub repository is public with PR-only `master`.
+
 ## Unreleased
 
 ### Performance
