@@ -35,8 +35,8 @@ finished project never get switched on.
       test
 - [ ] `fixtures/generate.ts` — seeded, deterministic, synthetic only
       (`docs/acceptance.md §2`)
-- [ ] the A1–A13 acceptance suite as code, starting with A2, A3, A8, A9, A11
-      (the ones that need no browser)
+- [ ] the acceptance suite as code (A1–A33), starting with the non-browser
+      criteria (A2, A3, A8, A9, A11, A32, A33)
 - [ ] CI gates: link + anchor check, example replay, generated-reference
       freshness, error-code coverage (`src` ↔ `errors.md`)
 - [ ] Definition of done written into AGENTS.md: behaviour change ⇒ test +
@@ -125,6 +125,10 @@ alternate per sheet, and section marks that name every section with its page;
 totals reconcile against the server's recomputation; the figure prints in
 grayscale; the fixture asserts both pages and strings; `sheets[]` stays flat, so
 a keep-together group that would span two sheets is moved rather than split.
+Tables follow `design §9.3`: `<thead>` repeats on every continued sheet, no row
+crosses a boundary, and a row taller than the printable body fails `E_LAYOUT`
+(A33). `fit: width|page` is one uniform scale applied *after* pagination — it
+never changes the sheet cut or the numbering plan (A21).
 
 ## Phase 6 — the cancellation notice
 
@@ -143,8 +147,12 @@ stack convention — `paper list` returns the ten named sizes in pt/mm/in so an
 agent never hard-codes a page; structured errors emitted as events; the event journal that makes
 `events` true (sure-state).
 
+The CLI resolves `--entity`/`--id` through sure-state (design §7); at the
+library boundary the call is `renderDocument({ layout, data })` with local
+inputs. It emits HTML — the host compiles PDF at the product edge (design §11).
+
 **Acceptance:** an agent runs
-`sure-document render --entity invoices --id INV-1042 --format pdf --verify-totals --agent`
+`sure-document render --entity invoices --id INV-1042 --format html --verify-totals --agent`
 and gets an envelope containing the file path, the page count and the guard
 results — with no human in the loop and no PDF eyeballing.
 
