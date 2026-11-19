@@ -58,7 +58,7 @@ layout  +  data  →  render  →  HTML  →  print | PDF (host compiled)
 | `README.md` | the pitch, the boundaries, the name |
 | `AGENTS.md` | the agent's contract and the gates |
 | `docs/index.md` | this file: reading orders and update duties |
-| `docs/design.md` | numbered decisions, dated |
+| `docs/design.md` | frozen, append-only ADR: numbered decisions, dated |
 | `docs/catalog.md` | report components: families, entries, two new blocks |
 | `docs/acceptance.md` | synthetic data policy and the A1–A33 acceptance suite |
 | `docs/legacy-report-engine.md` | the 2007 designs, distilled |

@@ -99,6 +99,12 @@ declares `sure_ui` blocks that exist; no product-specific word appears.
 
 ## Phase 4 — the renderer (this package, fixed mode)
 
+- [x] **Complete (2026-11-19).** `renderDocument`/`renderPanel`, flat `sheets[]`,
+      renderer-owned `@page`, sheet furniture, closed `@`/`.` grammar and the
+      sure-ui typography binding ship in this package. `npm run verify` is green;
+      the first consumer replaced its own print system with this renderer and
+      found one line-metrics defect, now fixed with a regression test.
+
 Extract from the first consumer: element model, expression evaluator, formatters,
 panel renderer. The ported agreement, notice page and coupons become the first
 fixtures (150 / 42 / 19 elements, page counts, key strings).

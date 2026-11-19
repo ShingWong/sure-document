@@ -4,6 +4,10 @@
 
 ### Documentation
 
+- `docs/design.md` is now an append-only Architectural Decision Record. All
+  decisions through Phase 4 are accepted and frozen (§1–§13 and §14.2); a change
+  must append a dated superseding section, never edit one. AGENTS.md enforces it.
+- `docs/plan.md` marks Phase 4 complete and `docs/index.md` checks all links.
 - Removed the transient `HANDOFF.md`. Its still-live rules — upstream release
   order, PR/CI/squash flow, 2FA approval of staged publishes, the seven-day
   expiry, and the refusal to weaken tests — now live in

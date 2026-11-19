@@ -108,6 +108,9 @@ Rules that keep both audiences served:
   carries the reading order for each audience.
 - **Dated decisions.** `docs/design.md` is numbered and dated so a later reader
   can tell what was settled from what was merely tried.
+- **ADR discipline.** `docs/design.md` is append-only: decisions through Phase 4
+  are accepted and frozen. Never edit one — append a dated section that names
+  what it supersedes and why.
 
 ## Data hygiene
 

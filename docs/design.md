@@ -1,8 +1,14 @@
 # Design — the document layer
 
-Numbered like the other design docs in the stack: each section is a decision
-with its reason, dated, so a later reader can tell what was settled from what
-was merely tried.
+**Architectural Decision Record — append-only and frozen.** Decisions §1–§13 and
+§14.2 are **accepted and frozen** as of 2026-11-19, through Phase 4. Do not edit
+an accepted decision: append a new numbered section that supersedes it, dated and
+with its reason. The open items in §14 remain open until an appended decision
+settles them.
+
+As in the other design docs in the stack, each section is numbered and dated and
+carries its reason, so a later reader can tell what was settled from what was
+merely tried.
 
 ---
 
@@ -505,3 +511,25 @@ test harness without a browser.
 | 6 | New sure-ui families | exactly two: `document` and `figure`. Everything printable that already exists (tables, totals, prose) reuses `table` / `markdown` rather than inventing a family |
 | 6a | Watermark default in non-production | stamp `EXAMPLE ONLY` from the environment unless the layout overrides — a preview deployment must not print an unmarked contract that looks real |
 | 7 | Order of upstream releases | sure-ui blocks → sure-factor schema 0.6 → catalog entries → this package; the registry test validates against the *installed* sure-ui, so declaring a block early fails CI (the `footer`/0.3.4 precedent) |
+
+## 15. Decision status — 2026-11-19
+
+Accepted and frozen. These sections are not to be edited; a change appends a new
+numbered decision that names the section it supersedes and says why.
+
+| Sections | Decision | Phase |
+|---|---|---|
+| §1–§2 | the document model: layout + data → HTML, two modes | 0 |
+| §3, §3.1–§3.3 | sheet arithmetic, paper, binding, imposition, scale vs zoom | 0, 4 |
+| §4 | element model, sheet furniture, figures | 0, 4 |
+| §5 | closed expression grammar — `@`/`root.`, `.`/`row.`, five aggregates, `ifpresent`, `E_SCOPE_INVALID` | 4 |
+| §6 | formats declared by the design; no host locale | 0 |
+| §7–§8 | sure-state data binding; guards and fixtures instead of PDF eyeballing | 0 |
+| §9, §9.1–§9.3 | renderer pagination, numbering plan, TOC fixed point, flat `sheets[]` | 0, 4 |
+| §10 | `issued`/`captured` dates only; no clock | 0 |
+| §11 | HTML primary; PDF compiled at the host edge; one layout, two media | 0, 4 |
+| §12–§13 | agent surface and non-goals | 0 |
+| §14.2 | PDF dependency policy — closed 2026-11-19 | 4 |
+
+The remaining §14 items (1, 3, 4, 5, 6, 6a, 7) are still leanings, not decisions.
+When one is settled, append a new numbered section; never rewrite §14.
