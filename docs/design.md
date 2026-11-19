@@ -209,21 +209,35 @@ are the only new families (`document`, `figure`); tables, totals and prose reuse
 
 ## 5. Expressions — a vocabulary, not a language
 
-The legacy designs use four forms, and that is the whole surface:
+The legacy designs used `P:` and `F:`. Both are **removed**. Scope is now
+explicit, so the parser never guesses which scope a bare name belongs to:
 
 ```
-P:Name                     a parameter
-F:Name                     a field of the current row
-sum:A,B,C                  arithmetic over parameters
-sub:A,B                    difference
-ifpresent:Guard->Then      a value only when `Guard` is present
+@name        root/document parameter
+root.name    the same, spelled out
+.name        a field of the current row
+row.name     the same, spelled out
+totals.name  a server-recomputed total (explicit root namespace)
+100, 0.05    numeric literals — raw digits, never a name
 ```
 
-**No conditionals beyond `ifpresent`, no loops, no functions, no scripting.**
-Every addition to this vocabulary must be forced by a real document; an
-expression language is where a reporting engine stops being verifiable.
+Five aggregates, with comma-separated operands; an explicit array range such
+as `rows.amount` is a legal operand:
 
-An unknown expression **throws** at render time. A document that silently loses
+```
+sum: .hours, .rate          sub: @initial, sum: rows.principal
+mul: .qty, @price           div: @total, .count
+avg: rows.amount            ifpresent: @discount -> @discount
+```
+
+**No bare identifiers, no implicit row fallback, no conditionals beyond
+`ifpresent`, no loops, no functions, no scripting.** A bare name, a removed
+`P:`/`F:` form, a `.field` with no active row, or an `@field` that does not exist
+fails closed with `E_SCOPE_INVALID`; an unknown form fails with `E_EXPR`. Every
+addition to this vocabulary must be forced by a real document — an expression
+language is where a reporting engine stops being verifiable.
+
+An invalid expression **throws** at render time. A document that silently loses
 a figure is worse than one that fails to build.
 
 ## 6. Formatting

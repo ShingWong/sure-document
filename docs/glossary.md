@@ -12,6 +12,7 @@ same thing will guess wrong.
 | **sheet set** | the flat, ordered `sheets[]` a document renders to; a break is between members, never inside one | a DOM subtree, one HTML page |
 | **band** | a horizontal strip of a fixed layout that lands on the sheet as a unit | a section (that is flow) |
 | **section** | a block in a flow layout; its height comes from its content | a band |
+| **expression** | the closed, scoped vocabulary of `design §5`: `@`/`root.` for parameters, `.`/`row.` for the current row, five aggregates, `ifpresent` | a script, a bare identifier, `P:`/`F:` |
 | **element** | one placed thing: text, field, line, box, image, table, figure | a component (that is a catalog entry) |
 | **panel** | a complete fixed layout, e.g. the ported agreement — a renderer's **input**; one panel can become several sheets | a page, a sheet |
 | **projection** | the columns a document prints, taken from a store's row | a query, a select |

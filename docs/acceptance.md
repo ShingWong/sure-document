@@ -75,7 +75,7 @@ Each row is a test, not a wish. `A` = acceptance, run by `npm test`; the
 |---|---|---|
 | **A1 layout identity** | given the ported fixed design, when rendered, then the element count, band heights and every coordinate equal the golden | a layout drift nobody meant |
 | **A2 formatting** | given a date and an amount, when formatted, then the output is `MM/DD/YYYY` and `$1,234.56` under any `TZ` and any locale | a paper that changes with the printer's machine |
-| **A3 expression vocabulary** | given each supported form, when evaluated, then the value is correct; given an unknown form, then `E_EXPR` with a hint naming the nearest supplied name | a silent blank where a figure belongs |
+| **A3 expression vocabulary** | given each supported form (`@`/`root.`, `.`/`row.`, literals, `sum`/`sub`/`mul`/`div`/`avg`, `ifpresent`), when evaluated, then the value is correct; given an unknown form then `E_EXPR`, and given a bare identifier, a `P:`/`F:` form, or an out-of-scope sigil then `E_SCOPE_INVALID` | a silent blank where a figure belongs, or a bare name guessed into the wrong scope |
 | **A4 blanks vs totals** | given a null field the design guards, then blank paper; given a missing total, then `E_DATA` | a signed form with a hole in it |
 | **A5 guards** | given rows whose sum disagrees with the recomputed total, then `E_GUARD` and no output | the failure Jasper could not detect |
 | **A6 pagination** | given 0, 1, 10, 11 and 40 rows, then the page count, repeated header and keep-together are as specified | a page that splits a signature block |

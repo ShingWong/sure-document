@@ -15,7 +15,8 @@ Envelope (in `--agent` mode):
 |---|---|---|---|
 | `E_LAYOUT` | 2 | a layout is malformed: band without height, element without geometry, page without size, a panel/section nested inside another sheet (sheets are siblings, `design §9.3`), or a single table row taller than the printable body height (`design §9.3`, A33) | fix the layout data, or split the row's content across rows; it is data, so the failure names the path |
 | `E_ELEMENT` | 2 | an element kind this version does not render | upgrade, or use a supported kind (`docs/design.md §4`) |
-| `E_EXPR` | 2 | an expression form outside the vocabulary, or a parameter/field that is not supplied | the vocabulary is closed (`design.md §5`); the hint names the nearest supplied name |
+| `E_EXPR` | 2 | an expression form outside the closed vocabulary (`design.md §5`) | use one of the five aggregates or `ifpresent`; the hint names the nearest valid form |
+| `E_SCOPE_INVALID` | 2 | a bare identifier, a removed `P:`/`F:` form, a `.field` with no active row, or a `@field`/`root.field` with no such parameter | scope is explicit: `@`/`root.` for parameters, `.`/`row.` for the current row; bare access never falls back |
 | `E_DATA` | 2 | the data does not match the layout's declared shape (`rows` given to a `record` element, a projection missing a column) | fix the projection at the caller, not the layout |
 | `E_FORMAT` | 2 | a declared format cannot render its value (e.g. `date` on a non-date) | fix the data; a format never guesses |
 | `E_FONT` | 2 | a declared typography token or font family cannot be resolved by the measurement oracle (A32) | declare a supported sure-ui type token, or supply metrics for the family; never fall back to a host font silently |

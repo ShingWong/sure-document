@@ -10,6 +10,7 @@ export const ERROR_CODES = [
   'E_LAYOUT',
   'E_ELEMENT',
   'E_EXPR',
+  'E_SCOPE_INVALID',
   'E_DATA',
   'E_FORMAT',
   'E_FONT',
