@@ -1,8 +1,9 @@
 # sure-document
 
 **Documents for the sure stack** — agreements, notices, statements, coupons —
-as **layout data**, rendered to HTML (and optionally PDF) with no reporting
-engine, no Java, no designer, and no second source of truth.
+as **layout data**, rendered to print-ready HTML (compiled to PDF by the host at
+the product edge) with no reporting engine, no Java, no designer, and no second
+source of truth.
 
 The stack is agent-first. A document here is text a coding agent can read,
 diff, generate and *verify*: a layout in TS/JSON plus a fixture that says what
@@ -11,7 +12,7 @@ replaces — a 2007 JasperReports `.jasper` is a compiled Java serialisation tha
 only iReport can open, so nothing could check it and nothing could improve it.
 
 ```
-layout (TS/JSON)  +  data (sure-state rows)  →  renderer  →  HTML  →  print / PDF
+layout (TS/JSON)  +  data (sure-state rows)  →  renderer  →  HTML  →  print / PDF (host)
                                                    │
                                             guards + fixtures
 ```
@@ -34,7 +35,7 @@ statement with forty transactions, a cancellation notice).
 | a report designer | layouts are code/data, reviewable in a diff |
 | a charting library | figures are SVG built from scales; no canvas, no animation, no dependency |
 | a second catalog registry | component definitions live in **sure-store/components** (MIT), consumed through sure-factor |
-| a human-first CLI | `--agent` is the mode with a complete machine contract; human output is the default view of the same data |
+| a human-first CLI | `sure-document` commands support `--agent`, the complete machine contract; human output is the default view of the same data |
 
 ## Where it sits
 
