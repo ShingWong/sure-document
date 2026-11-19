@@ -138,8 +138,12 @@ describe('security gate patterns', () => {
     // A money figure such as 1480.8000000000002 contains a 13-digit run that
     // passes Luhn; reporting floats as cards buries the real findings.
     expect(scanText('{"totalDP": 1480.8000000000002}', 'examples/x.json')).toEqual([])
-    // A real card still fires.
+    // A real card still fires, formatted or not.
     expect(scanText('card 4111111111111111', 'docs/x.md').map((f) => f.label)).toContain('Card number')
+    expect(scanText('card 4111 1111 1111 1111', 'docs/x.md').map((f) => f.label)).toContain('Card number')
+    // A digit run inside a hash is not a card: Cargo.lock checksums reported as
+    // cards were fifteen findings in one file.
+    expect(scanText('checksum = "c982642fa9e8606056828ee9a8505737230110bb1099153c79efe865c59d12ba"', 'Cargo.lock')).toEqual([])
   })
 
   it('treats a licence header as a declaration and prose as a leak', async () => {

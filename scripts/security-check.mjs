@@ -190,7 +190,7 @@ export function scanText(text, file = '<memory>') {
     // The lookarounds keep a decimal *fraction* out: a money figure such as
     // 1480.8000000000002 contains a 13-digit run that happens to pass Luhn, and
     // reporting every long float as a card number buries the real findings.
-    for (const m of line.matchAll(/(?<![\d.])(?:\d[ -]?){12,18}\d(?![\d.])/g)) {
+    for (const m of line.matchAll(/(?<![\w.])(?:\d[ -]?){12,18}\d(?![\w.])/g)) {
       const digits = m[0].replace(/\D/g, '')
       if (digits.length < 13 || digits.length > 19 || !luhnValid(digits)) continue
       if (ALLOW.some((a) => (a.file === '*' || a.file === file) && a.label === 'Card number' && m[0].includes(a.match))) continue
