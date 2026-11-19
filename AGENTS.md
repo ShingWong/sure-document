@@ -156,7 +156,10 @@ script, keyed by file + label + exact match, with a reason.
    a block before it has shipped.
 2. PR → CI green (`lint, build, test`) → squash merge to `master`.
 3. Merging stages the npm release. A human with 2FA must approve it **the same
-   day**: staged publishes expire after seven days and simply vanish.
+   day**: staged publishes expire after seven days and simply vanish. CI uses
+   OIDC trusted publishing — configure it on npm with owner `ShingWong`, repo
+   `sure-document`, workflow `publish.yml`, no environment. No npm token lives
+   in this repository.
 4. The repository is private until the first stable release, then goes public
    under the same MIT license; enable branch protection on `master` then. It
    cannot be set while private on this account's free `User` plan (403), so
