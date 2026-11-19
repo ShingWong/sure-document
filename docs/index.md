@@ -35,7 +35,7 @@ If you only have one file: `AGENTS.md`. If you only have one command:
 ## The model in sixty seconds
 
 ```
-layout  +  data  →  render  →  HTML  →  print | PDF
+layout  +  data  →  render  →  HTML  →  print | PDF (host compiled)
 ```
 
 - **layout** — bands and elements with geometry (`fixed`) or sections whose
@@ -56,10 +56,13 @@ layout  +  data  →  render  →  HTML  →  print | PDF
 
 | Path | Holds |
 |---|---|
+| `HANDOFF.md` | transient state: status, first tasks, open decisions |
 | `README.md` | the pitch, the boundaries, the name |
 | `AGENTS.md` | the agent's contract and the gates |
+| `docs/index.md` | this file: reading orders and update duties |
 | `docs/design.md` | numbered decisions, dated |
 | `docs/catalog.md` | report components: families, entries, two new blocks |
+| `docs/acceptance.md` | synthetic data policy and the A1–A33 acceptance suite |
 | `docs/legacy-report-engine.md` | the 2007 designs, distilled |
 | `docs/plan.md` | phases and acceptance criteria |
 | `docs/glossary.md` | one word per concept |
@@ -73,8 +76,9 @@ layout  +  data  →  render  →  HTML  →  print | PDF
 | an element kind or attribute | `design.md` §4, `glossary.md` |
 | an expression form | `design.md` §5, `errors.md` (`E_EXPR`) |
 | a formatter | `design.md` §6 |
+| a typography token or font mapping consumed here | `design.md` §9, `catalog.md` §4; the token itself lives in sure-ui |
 | a catalog entry or its data shape | `catalog.md`, the entry's fixture, `examples/` |
-| a CLI command or flag | `AGENTS.md` (agent surface), generated `schema`, `README` |
+| a CLI command or flag | `AGENTS.md` (agent surface), `design.md` §12, generated `schema`, `README` |
 | a new error | `errors.md` + a test that raises it |
 | a fixture | `"synthetic": true` + a seed; never a real row (`acceptance.md §1`) |
 | a phase completed | `plan.md` checkbox, `CHANGELOG.md` |
