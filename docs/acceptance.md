@@ -40,7 +40,7 @@ Both run; neither holds the other's secrets.
 `fixtures/generate.ts` — a spec, not yet code:
 
 ```bash
-npm run fixtures -- --shape rows --rows 40 --seed 20261119 > fixtures/statement-40.json
+npm run --silent fixtures -- --shape rows --rows 40 --seed 20261119 > fixtures/statement-40.json
 ```
 
 - deterministic (a small PRNG seeded from `--seed`; no `Math.random`)

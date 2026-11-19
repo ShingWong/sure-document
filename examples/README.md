@@ -16,13 +16,16 @@ snippet to read — it is a test that runs**, so it cannot drift from the code.
 1. **Synthetic only.** Invented names, round amounts, future dates, and
    `"synthetic": true` with the seed that produced it — `docs/acceptance.md §1`.
    An example that looks like real paper invites a real record.
-2. **Generated, not typed.** `npm run fixtures -- --shape rows --rows 40 --seed …`
-   produces the file and its manifest; the seed is recorded.
+2. **Generated, not typed.** `npm run --silent fixtures -- --shape rows --rows 40 --seed …`
+   produces the JSON on stdout (redirect it to a file); `--silent` keeps npm's
+   script banner out of the redirect. The seed is recorded in the output.
 3. **One copy.** The docs link to these files; no example is pasted twice. If a
    walkthrough needs a shortened view, it links and quotes with a line citation.
-4. **Executed.** `npm test` renders every example and asserts the facts in
-   `expect` (strings, page count, element count). A new example without an
-   assertion is not an example, it is a file.
+4. **Executed.** `npm test` replays every example and asserts the facts in
+   `expect` (element/row/point counts, totals, strings present in layout and
+   data). When the renderer lands (Phase 4) the same `expect` grows rendered
+   strings and page counts. A new example without an assertion is not an
+   example, it is a file.
 
 ## Why not screenshots
 

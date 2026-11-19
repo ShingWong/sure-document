@@ -1,0 +1,31 @@
+/**
+ * The stable error-code catalog — data only, no renderer.
+ *
+ * `scripts/check-errors.mjs` scans `src/` for quoted codes and compares the
+ * set with the table in `docs/errors.md`, in both directions. Keeping the
+ * catalog here (rather than in prose) is what makes that gate real before the
+ * renderer lands in Phase 4.
+ */
+export const ERROR_CODES = [
+  'E_LAYOUT',
+  'E_ELEMENT',
+  'E_EXPR',
+  'E_DATA',
+  'E_FORMAT',
+  'E_FONT',
+  'E_GUARD',
+  'E_FIXTURE',
+  'E_PAGE',
+  'E_PAPER',
+  'E_BINDING',
+  'E_TOC',
+  'E_NUMBERING',
+  'E_BLEED',
+  'E_IMPOSITION',
+  'E_SCALE',
+  'E_ASYNC',
+  'ECONFIRM',
+  'EINTERACTIVE',
+] as const
+
+export type ErrorCode = (typeof ERROR_CODES)[number]

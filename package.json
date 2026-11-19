@@ -1,0 +1,50 @@
+{
+  "name": "@shing.wong/sure-document",
+  "version": "0.0.0",
+  "description": "Layout + rows to print-ready HTML — deterministic, dependency-free documents for the sure stack.",
+  "license": "MIT",
+  "author": "ShingWong",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./layout": {
+      "types": "./dist/layout.d.ts",
+      "import": "./dist/layout.js"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "import": "./dist/format.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*"
+  ],
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "fixtures": "tsx fixtures/generate.ts",
+    "fixtures:examples": "tsx scripts/make-examples.mjs",
+    "check:exports": "node scripts/check-exports.mjs",
+    "check:errors": "node scripts/check-errors.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:examples": "node scripts/check-examples.mjs",
+    "verify": "npm run lint && npm run build && npm test && npm run check:errors && npm run check:docs && npm run check:examples && npm run check:exports"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.9"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

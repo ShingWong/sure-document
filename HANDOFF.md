@@ -1,8 +1,12 @@
 # Handoff — sure-document
 
-**State as of 2026-11-19.** Documentation only: no source, no `package.json`, no
-git repository, nothing published. The owner asked that `git init` not happen
-until they say so — **do not initialise the repository or publish anything.**
+**State as of 2026-11-19.** Private GitHub repo `ShingWong/sure-document` on
+`master`. The documentation contract and the Phase 0.5 test harness (gates,
+seeded fixture generator, three examples) exist locally; the renderer and the
+A1–A33 acceptance tests do not. Nothing is published. **Do not publish** —
+releases need the owner's 2FA, and the repo stays private until first stable
+release. Upstream implementation of the first three tasks is underway in the
+sibling repos as local, unpushed work.
 
 Read [docs/index.md](docs/index.md) first; it carries a reading order for an
 agent (seven steps) and for a human. This file is the *transient* part — status,
@@ -15,6 +19,11 @@ first tasks, guardrails. Decisions live in [docs/design.md](docs/design.md) and
 
 | File | Holds |
 |---|---|
+| `package.json`, `tsconfig*.json`, `vitest.config.ts` | package surface and build/test config (zero runtime dependencies) |
+| `scripts/check-*.mjs`, `tests/gates.test.ts` | Phase 0.5 gates, each proven to fail on a broken input |
+| `fixtures/generate.ts`, `examples/*.json` | seeded, synthetic fixtures (seed `20261119`) |
+| `scripts/security-check.mjs`, `githooks/`, `.github/workflows/security.yml` | commit + push leak gate |
+| `CHANGELOG.md` | changes, including why `check:exports` stays red until Phase 4 |
 | `README.md` | what it is, what it is not, the name decision |
 | `AGENTS.md` | what belongs here, refusals, agent surface, doc duties, data hygiene, gates |
 | `docs/design.md` | 14 numbered decisions: modes, sheet, elements, expressions, verification, pagination, numbering, output |

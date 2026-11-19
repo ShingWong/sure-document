@@ -1,0 +1,304 @@
+{
+  "name": "flow-rows-40",
+  "mode": "flow",
+  "shape": "rows",
+  "synthetic": true,
+  "seed": 20261119,
+  "generatedAt": "2026-11-19",
+  "layout": {
+    "mode": "flow",
+    "sheet": {
+      "size": "letter",
+      "orientation": "portrait"
+    },
+    "sections": [
+      {
+        "id": "header",
+        "repeat": "all",
+        "elements": [
+          {
+            "kind": "text",
+            "id": "title",
+            "value": "Statement of account"
+          }
+        ]
+      },
+      {
+        "id": "rows",
+        "repeat": "rows",
+        "elements": [
+          {
+            "kind": "field",
+            "id": "description",
+            "value": "P:description"
+          }
+        ]
+      },
+      {
+        "id": "totals",
+        "elements": [
+          {
+            "kind": "field",
+            "id": "grand-total",
+            "value": "F:currency:grand_total"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "rows": [
+      {
+        "line_number": 1,
+        "due_on": "2031-04-15",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 2,
+        "due_on": "2031-05-15",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 3,
+        "due_on": "2031-06-14",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 4,
+        "due_on": "2031-07-14",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 5,
+        "due_on": "2031-08-13",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 6,
+        "due_on": "2031-09-12",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 7,
+        "due_on": "2031-10-12",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 8,
+        "due_on": "2031-11-11",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 9,
+        "due_on": "2031-12-11",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 10,
+        "due_on": "2032-01-10",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 11,
+        "due_on": "2032-02-09",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 12,
+        "due_on": "2032-03-10",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 13,
+        "due_on": "2032-04-09",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 14,
+        "due_on": "2032-05-09",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 15,
+        "due_on": "2032-06-08",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 16,
+        "due_on": "2032-07-08",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 17,
+        "due_on": "2032-08-07",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 18,
+        "due_on": "2032-09-06",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 19,
+        "due_on": "2032-10-06",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 20,
+        "due_on": "2032-11-05",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 21,
+        "due_on": "2032-12-05",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 22,
+        "due_on": "2033-01-04",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 23,
+        "due_on": "2033-02-03",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 24,
+        "due_on": "2033-03-05",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 25,
+        "due_on": "2033-04-04",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 26,
+        "due_on": "2033-05-04",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 27,
+        "due_on": "2033-06-03",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 28,
+        "due_on": "2033-07-03",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 29,
+        "due_on": "2033-08-02",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 30,
+        "due_on": "2033-09-01",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 31,
+        "due_on": "2033-10-01",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 32,
+        "due_on": "2033-10-31",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 33,
+        "due_on": "2033-11-30",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 34,
+        "due_on": "2033-12-30",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 35,
+        "due_on": "2034-01-29",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 36,
+        "due_on": "2034-02-28",
+        "amount": 120,
+        "description": "Test Person A"
+      },
+      {
+        "line_number": 37,
+        "due_on": "2034-03-30",
+        "amount": 120,
+        "description": "Example Holdings LLC"
+      },
+      {
+        "line_number": 38,
+        "due_on": "2034-04-29",
+        "amount": 120,
+        "description": "Sample Party C"
+      },
+      {
+        "line_number": 39,
+        "due_on": "2034-05-29",
+        "amount": 120,
+        "description": "Placeholder Group"
+      },
+      {
+        "line_number": 40,
+        "due_on": "2034-06-28",
+        "amount": 120,
+        "description": "Test Person A"
+      }
+    ],
+    "totals": {
+      "grand_total": 4800
+    }
+  },
+  "expect": {
+    "rows": 40,
+    "total": 4800,
+    "contains": [
+      "2031-04-15",
+      "2034-06-28"
+    ]
+  }
+}

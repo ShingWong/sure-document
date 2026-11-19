@@ -1,0 +1,13 @@
+{
+  // Build-only config: emit src/ into dist/, omit the harness and tests.
+  // Tests stay in the base config's `include` so `npm run lint` still sees them.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "noEmit": false,
+    "allowImportingTsExtensions": false
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -1,0 +1,68 @@
+{
+  "name": "series-bars",
+  "mode": "figure",
+  "shape": "series",
+  "synthetic": true,
+  "seed": 20261119,
+  "generatedAt": "2026-11-19",
+  "layout": {
+    "mode": "fixed",
+    "sheet": {
+      "size": "letter",
+      "orientation": "portrait"
+    },
+    "bands": [
+      {
+        "id": "figure",
+        "height": 240,
+        "elements": [
+          {
+            "kind": "image",
+            "id": "bars",
+            "x": 36,
+            "y": 36,
+            "w": 540,
+            "h": 180,
+            "figure": {
+              "type": "bar",
+              "series": "points",
+              "tableFallback": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "series": {
+      "tableFallback": true,
+      "points": [
+        {
+          "label": "Delta",
+          "value": 120
+        },
+        {
+          "label": "Beta",
+          "value": 240
+        },
+        {
+          "label": "Gamma",
+          "value": 360
+        }
+      ]
+    },
+    "totals": {
+      "grand_total": 720
+    }
+  },
+  "expect": {
+    "elements": 1,
+    "seriesPoints": 3,
+    "total": 720,
+    "contains": [
+      "Delta",
+      "Beta",
+      "Gamma"
+    ]
+  }
+}

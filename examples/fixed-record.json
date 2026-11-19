@@ -1,0 +1,61 @@
+{
+  "name": "fixed-record",
+  "mode": "fixed",
+  "shape": "record",
+  "synthetic": true,
+  "seed": 20261119,
+  "generatedAt": "2026-11-19",
+  "layout": {
+    "mode": "fixed",
+    "sheet": {
+      "size": "letter",
+      "orientation": "portrait"
+    },
+    "bands": [
+      {
+        "id": "body",
+        "height": 200,
+        "elements": [
+          {
+            "kind": "text",
+            "id": "party-label",
+            "x": 36,
+            "y": 36,
+            "w": 180,
+            "h": 14,
+            "value": "Party"
+          },
+          {
+            "kind": "field",
+            "id": "party",
+            "x": 36,
+            "y": 56,
+            "w": 240,
+            "h": 14,
+            "value": "P:party"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "record": {
+      "line_number": 1,
+      "issued_on": "2031-04-15",
+      "party": "Sample Party C",
+      "amount": 120
+    },
+    "totals": {
+      "grand_total": 120
+    }
+  },
+  "expect": {
+    "elements": 2,
+    "recordFields": 4,
+    "total": 120,
+    "contains": [
+      "Sample Party C",
+      "2031-04-15"
+    ]
+  }
+}

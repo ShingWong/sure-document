@@ -1,0 +1,23 @@
+{
+  // Base config. `npm run lint` typechecks the renderer, the harness and the
+  // generator together: a type error in a gate script is still a type error.
+  // The emit step overrides `include`/`rootDir` in tsconfig.build.json.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "allowJs": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src", "fixtures", "tests", "vitest.config.ts"]
+}
