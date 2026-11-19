@@ -160,10 +160,9 @@ script, keyed by file + label + exact match, with a reason.
    OIDC trusted publishing — configure it on npm with owner `ShingWong`, repo
    `sure-document`, workflow `publish.yml`, no environment. No npm token lives
    in this repository.
-4. The repository is private until the first stable release, then goes public
-   under the same MIT license; enable branch protection on `master` then. It
-   cannot be set while private on this account's free `User` plan (403), so
-   PR-only merging is a convention until then.
+4. The repository went public at the first stable release (0.1.0) under the
+   same MIT license, and `master` is PR-protected. Branch protection was not
+   available on this account's free plan while the repo was private.
 5. Never weaken a test to make a phase pass. If an acceptance row is wrong, say
    so and change the row with a reason. The product's paper, wording and
    geometry stay in the product's repository; never copy them here.
