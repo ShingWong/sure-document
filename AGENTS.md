@@ -134,8 +134,11 @@ not loosen a pattern. A deliberate placeholder goes in the `ALLOW` list in the
 script, keyed by file + label + exact match, with a reason.
 
 The repository is **private until the first stable release**, then goes public
-under the same MIT licence. A publish workflow (staged npm release, human 2FA
-approval) is added when the package and its version exist — see `HANDOFF.md`.
+under the same MIT licence. At that point also enable branch protection on
+`master` and add the publish workflow (staged npm release, human 2FA approval).
+Protection cannot be set while the repo is private: the account is on GitHub's
+free `User` plan, which returns 403 for branch protection and rulesets on private
+repos. Do not retry it before the release — see `HANDOFF.md`.
 
 ## Build & test
 

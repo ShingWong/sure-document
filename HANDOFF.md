@@ -126,7 +126,10 @@ Plus: the doc row for the change (`docs/index.md §When to update what`), a
 3. Merging stages the package on npm; a **human with 2FA must approve it**, and
    **staged publishes expire after seven days** — a release staged and forgotten
    simply vanishes. Ask the owner to approve the same day.
-4. `master` is protected: a direct push fails; everything goes through a PR.
+4. `master` is to be protected once the repo goes public at first stable release:
+   a direct push must fail; everything goes through a PR. Until then the account's
+   free `User` plan returns 403 for protection on a private repo, so this is a
+   convention only — see `AGENTS.md §Security gate`.
 
 ## The product this serves
 
