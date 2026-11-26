@@ -155,7 +155,7 @@ do.
 | `@shing.wong/sure-store` | `^0.4.1` | Public component definitions (`sure-store/components/`) with synthetic goldens |
 | `@shing.wong/sure-factor` | `^0.6.2` | Catalog schema compiler: field metadata, print bindings, guard validation |
 | `@shing.wong/sure-ui` | `^0.3.7` | Theme tokens and `SURE_TYPOGRAPHY`, mapping `--sure-font-*` to physical point metrics |
-| **`@shing.wong/sure-document`** | `0.0.0` | Pure layout projection, expressions, band arithmetic and print emission |
+| **`@shing.wong/sure-document`** | `0.1.0` | Pure layout projection, expressions, band arithmetic and print emission |
 
 ---
 
@@ -165,7 +165,7 @@ do.
 npm install @shing.wong/sure-document
 ```
 
-The first stable release is `0.1.0`. Include sure-ui's compiled CSS in the host
+The current release is `0.1.0`. Include sure-ui's compiled CSS in the host
 (for example via `compose()` from `@shing.wong/sure-ui@0.3.7`) so the emitted
 `.sure-document__*` classes are painted. Flow mode and the table of contents are
 still on the roadmap; see [docs/plan.md](docs/plan.md).

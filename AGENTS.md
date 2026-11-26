@@ -18,8 +18,8 @@ would not have — see "The agent surface" below.
 
 | Here | Not here |
 |---|---|
-| the element model (`text`, `field`, `line`, `box`, `image`, `table`) | SQL, fetch, joins, caching — that is **sure-state** |
-| expressions and formatters (`P:`, `F:`, `sum:`, `ifpresent:`) | field labels, validation, limits — that is **sure-factor** |
+| the element model (`text`, `line`, `rect`, `image`, `table`, `figure`, `signature`) | SQL, fetch, joins, caching — that is **sure-state** |
+| expressions and formatters (`@`/`root.`, `.`/`row.`, five aggregates, `ifpresent`) | field labels, validation, limits — that is **sure-factor** |
 | pagination, bands, keep-together, page numbers | colors, fonts, class vocabulary — that is **sure-ui** |
 | `fixed` (absolute) and `flow` (banded) layout modes | component *definitions* (catalog YAML) — that is **sure-store/components** |
 | print-ready HTML/CSS; PDF compiled by the host at the product edge (`design §11`) | business wording and legal prose — that is each product's content |
@@ -122,8 +122,10 @@ fixture, not an example, not a doc snippet:
 - names are invented, amounts are round, dates are in the future;
 - no company name, address, phone, license, contract number or agent id;
 - a public repository must not hold the private denylist it is scanned against —
-  that scan runs in the consumer's CI (`SUN_DENYLIST`), and this repo keeps only
-  the structural checks (synthetic flag, seed, identifier patterns).
+  the explicit terms live in `ShingWong/sure-master` and are fetched into CI by
+  the shared [`sure-ci-gate`](https://github.com/ShingWong/sure-ci-gate) using
+  `SURE_SECURITY_TOKEN`; this repo keeps only the structural checks (synthetic
+  flag, seed, identifier patterns).
 
 A product's own paper — wording, geometry, parameter names — stays in that
 product's repository. If you need it here to write an example, the example is
@@ -140,14 +142,16 @@ runs at two points:
   `git config core.hooksPath githooks`. It scans the **index**, not the working
   tree, so staged content is what is checked even if the file was later deleted
   from disk.
-- **push / PR** — `.github/workflows/security.yml`, which runs the same scanner
-  in CI so the gate holds even for a clone that skipped the hook.
+- **push / PR** — `.github/workflows/security.yml` and `ci.yml` run the same
+  scanner in CI so the gate holds even for a clone that skipped the hook.
+- **shared gate** — `.github/workflows/ci-gate.yml` calls `sure-ci-gate`, which
+  adds the private term list fetched with `SURE_SECURITY_TOKEN`.
 
-It will also run in `prepublishOnly` once there is a package to publish. The
-private product denylist stays out of this repository by design; only the
-consumer's CI holds it. When the scanner flags something, fix the value — do
-not loosen a pattern. A deliberate placeholder goes in the `ALLOW` list in the
-script, keyed by file + label + exact match, with a reason.
+It also runs in `prepublishOnly`. The private denylist stays in
+`ShingWong/sure-master` by design, not in this repository. When the scanner
+flags something, fix the value — do not loosen a pattern. A deliberate
+placeholder goes in the `ALLOW` list in the script, keyed by file + label +
+exact match, with a reason.
 
 ## Release mechanics
 
@@ -188,11 +192,10 @@ corpus — 150 / 42 / 19 elements, page counts, key strings. Goldens assert **fa
 a change in attribute order or whitespace is not a document change (`design §8`,
 `plan.md` Phase 4).
 
-## Exports (planned, sure-factor's shape)
+## Exports (shipped, sure-factor's shape)
 
-An `exports` map of `{ types, import }` pairs, one entry per module — the same
-shape sure-factor and sure-ui publish, so `check:exports` is the same script
-pattern:
+The `exports` map uses `{ types, import }` pairs — the same shape sure-factor
+and sure-ui publish, so `check:exports` is the same script pattern:
 
 | Subpath | Symbol | Purpose |
 |---|---|---|
@@ -225,7 +228,7 @@ A **generated** report module follows sure-factor's client-target precedent
 ## Memory
 
 This project has a positronic brain **`sure-document`** (`.positronic/`,
-long_term/lexical/live). **Recall before you re-derive:** query the brain
+long_term/local-embeddings/live). **Recall before you re-derive:** query the brain
 (`positronic recall "<topic>"` / `positronic ask "<object>"`) before touching the
 filesystem — before answering project questions, starting a task, editing a file,
 or resuming work. Re-derive from files only when recall returns nothing relevant;
